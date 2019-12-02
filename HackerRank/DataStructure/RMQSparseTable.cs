@@ -31,7 +31,7 @@ namespace HackerRank.DataStructure
 
         private void PreProcess()
         {
-            var logN = (int)Math.Ceiling(Math.Log2(elems.Count));
+            var logN = (int)Math.Ceiling(Math.Log(elems.Count, 2));
             for (int i = 0; i < elems.Count; i++)
             {
                 if (M[i] == null)
@@ -43,8 +43,6 @@ namespace HackerRank.DataStructure
                 var pow = (int)Math.Pow(2, j - 1);
                 for (int i = 0; i + pow < elems.Count; i++)
                 {
-                    //i== 0, j ==1
-                    //1,2,3,4
                     var idx1 = M[i][j - 1];
                     var idx2 = M[i + pow][j - 1];
                     if (compare(elems[idx1], elems[idx2]))
@@ -57,7 +55,7 @@ namespace HackerRank.DataStructure
 
         public int MinIdx(int i, int j)
         {
-            var k = (int)Math.Floor(Math.Log(j - i + 1));
+            var k = (int)Math.Floor(Math.Log(j - i + 1, 2));
             var idx1 = M[i][k];
             var idx2 = M[j - (int)Math.Pow(2, k) + 1][k];
             if (compare(elems[idx1], elems[idx2]))
