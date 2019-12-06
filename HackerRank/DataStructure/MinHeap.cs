@@ -1,36 +1,9 @@
-﻿using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
 
-class Solution
+namespace HackerRank.DataStructure
 {
-
-    // Complete the makingAnagrams function below.
-    static IEnumerable<int> solve(List<List<int>> queries)
-    {
-        var heap = new Heap();
-        foreach (var query in queries)
-        {
-            if (query[0] == 1)
-                heap.Add(query[1]);
-            if (query[0] == 2)
-                heap.Remove(query[1]);
-            if (query[0] == 3)
-                yield return heap.Root;
-        }
-    }
-
-    public class Heap 
+    public class MinHeap
     {
         private readonly List<int> items = new List<int>();
 
@@ -111,31 +84,5 @@ class Solution
         public int Root => items[0];
 
         public int BruteForce => items.Min();
-    }
-
-    static void Main(string[] args)
-    {
-        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
-
-        int n = Convert.ToInt32(Console.ReadLine());
-
-        var queries = new List<List<int>>();
-
-        for (int queriesItr = 0; queriesItr < n; queriesItr++)
-        {
-            var qLine = Console.ReadLine().Split(' ');
-            var qint = qLine.Where(s => !string.IsNullOrEmpty(s)).Select(q => Convert.ToInt32(q));
-            queries.Add(new List<int>(qint));
-        }
-
-        int[] result = solve(queries).ToArray();
-
-        foreach (var res in result)
-        {
-            textWriter.WriteLine(res);
-        }
-
-        textWriter.Flush();
-        textWriter.Close();
     }
 }
