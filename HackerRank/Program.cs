@@ -32,6 +32,7 @@ class Solution
             heap.Add(newItem);
             counter++;
         }
+
         return counter;
     }
 
@@ -43,6 +44,9 @@ class Solution
         {
             items.Add(it);
             FixHeapUp(items.Count - 1);
+#if DEBUG
+            CheckHeapProperty(0);
+#endif
         }
 
         private void FixHeapUp(int idx)
@@ -62,7 +66,7 @@ class Solution
 
         private static int ParentIdx(int idx)
         {
-            return idx / 2;
+            return (idx - 1) / 2;
         }
 
         public int Pop()
@@ -84,6 +88,9 @@ class Solution
             items.RemoveAt(items.Count - 1);
             if (idx < items.Count)
                 FixHeapDown(idx);
+#if DEBUG
+            CheckHeapProperty(0);
+#endif
             return item;
         }
 
@@ -93,7 +100,7 @@ class Solution
             var childIdx1 = ChildIdx1(idx);
             if (childIdx1 >= items.Count)
                 return;
-            var childIdx2 = idx * 2 + 2;
+            var childIdx2 = ChildIdx2(idx);
             var childVal1 = items[childIdx1];
             var childVal2 = childIdx2 >= items.Count ? int.MaxValue : items[childIdx2];
             if (curr <= childVal1 && curr <= childVal2)
@@ -120,6 +127,11 @@ class Solution
             return idx * 2 + 1;
         }
 
+        private static int ChildIdx2(int idx)
+        {
+            return idx * 2 + 2;
+        }
+
         public bool Any()
         {
             return items.Any();
@@ -128,6 +140,18 @@ class Solution
         public int Root => items[0];
 
         public int BruteForce => items.Min();
+
+        public void CheckHeapProperty(int idx)
+        {
+            if (idx >= items.Count)
+                return;
+            var c1 = ChildIdx1(idx);
+            var c2 = ChildIdx2(idx);
+            if ((c1 < items.Count && items[idx] > items[c1]) || (c2 < items.Count && items[idx] > items[c2]))
+                throw new Exception("Heap is bad");
+            CheckHeapProperty(c1);
+            CheckHeapProperty(c2);
+        }
     }
 
     static void Main(string[] args)
@@ -139,9 +163,9 @@ class Solution
         int n = Convert.ToInt32(nk[0]);
 
         int k = Convert.ToInt32(nk[1]);
+        var input = Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
-        int[] A = Array.ConvertAll(Console.ReadLine().Split(' '), ATemp => Convert.ToInt32(ATemp))
-        ;
+        int[] A = Array.ConvertAll(input, ATemp => Convert.ToInt32(ATemp));
         int result = cookies(k, A);
 
         textWriter.WriteLine(result);

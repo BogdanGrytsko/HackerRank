@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HackerRank.DataStructure
@@ -11,6 +12,9 @@ namespace HackerRank.DataStructure
         {
             items.Add(it);
             FixHeapUp(items.Count - 1);
+#if DEBUG
+            CheckHeapProperty(0);
+#endif
         }
 
         private void FixHeapUp(int idx)
@@ -30,7 +34,7 @@ namespace HackerRank.DataStructure
 
         private static int ParentIdx(int idx)
         {
-            return idx / 2;
+            return (idx - 1) / 2;
         }
 
         public int Pop()
@@ -52,6 +56,9 @@ namespace HackerRank.DataStructure
             items.RemoveAt(items.Count - 1);
             if (idx < items.Count)
                 FixHeapDown(idx);
+#if DEBUG
+            CheckHeapProperty(0);
+#endif
             return item;
         }
 
@@ -61,7 +68,7 @@ namespace HackerRank.DataStructure
             var childIdx1 = ChildIdx1(idx);
             if (childIdx1 >= items.Count)
                 return;
-            var childIdx2 = idx * 2 + 2;
+            var childIdx2 = ChildIdx2(idx);
             var childVal1 = items[childIdx1];
             var childVal2 = childIdx2 >= items.Count ? int.MaxValue : items[childIdx2];
             if (curr <= childVal1 && curr <= childVal2)
@@ -88,6 +95,11 @@ namespace HackerRank.DataStructure
             return idx * 2 + 1;
         }
 
+        private static int ChildIdx2(int idx)
+        {
+            return idx * 2 + 2;
+        }
+
         public bool Any()
         {
             return items.Any();
@@ -96,5 +108,17 @@ namespace HackerRank.DataStructure
         public int Root => items[0];
 
         public int BruteForce => items.Min();
+
+        public void CheckHeapProperty(int idx)
+        {
+            if (idx >= items.Count)
+                return;
+            var c1 = ChildIdx1(idx);
+            var c2 = ChildIdx2(idx);
+            if ((c1 < items.Count && items[idx] > items[c1]) || (c2 < items.Count && items[idx] > items[c2]))
+                throw new Exception("Heap is bad");
+            CheckHeapProperty(c1);
+            CheckHeapProperty(c2);
+        }
     }
 }
