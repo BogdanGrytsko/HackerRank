@@ -33,14 +33,26 @@ namespace HackerRank.DataStructure
             return idx / 2;
         }
 
+        public int Pop()
+        {
+            return RemoveByIdx(0);
+        }
+
         public void Remove(int it)
         {
             //this can be improved by using Dictionary
             var idx = items.IndexOf(it);
+            RemoveByIdx(idx);
+        }
+
+        private int RemoveByIdx(int idx)
+        {
+            var item = items[idx];
             items[idx] = items[items.Count - 1];
             items.RemoveAt(items.Count - 1);
             if (idx < items.Count)
                 FixHeapDown(idx);
+            return item;
         }
 
         private void FixHeapDown(int idx)

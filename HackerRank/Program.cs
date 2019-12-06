@@ -14,23 +14,28 @@ using System;
 
 class Solution
 {
-
-    // Complete the makingAnagrams function below.
-    static IEnumerable<int> solve(List<List<int>> queries)
+    static int cookies(int k, int[] A)
     {
-        var heap = new Heap();
-        foreach (var query in queries)
+        var heap = new MinHeap();
+        foreach (var item in A)
         {
-            if (query[0] == 1)
-                heap.Add(query[1]);
-            if (query[0] == 2)
-                heap.Remove(query[1]);
-            if (query[0] == 3)
-                yield return heap.Root;
+            heap.Add(item);
         }
+        var counter = 0;
+        while (heap.Any() && heap.Root < k)
+        {
+            var item1 = heap.Pop();
+            if (!heap.Any())
+                return -1;
+            var item2 = heap.Pop();
+            var newItem = item1 + 2 * item2;
+            heap.Add(newItem);
+            counter++;
+        }
+        return counter;
     }
 
-    public class Heap 
+    public class MinHeap
     {
         private readonly List<int> items = new List<int>();
 
@@ -60,14 +65,26 @@ class Solution
             return idx / 2;
         }
 
+        public int Pop()
+        {
+            return RemoveByIdx(0);
+        }
+
         public void Remove(int it)
         {
             //this can be improved by using Dictionary
             var idx = items.IndexOf(it);
+            RemoveByIdx(idx);
+        }
+
+        private int RemoveByIdx(int idx)
+        {
+            var item = items[idx];
             items[idx] = items[items.Count - 1];
             items.RemoveAt(items.Count - 1);
             if (idx < items.Count)
                 FixHeapDown(idx);
+            return item;
         }
 
         private void FixHeapDown(int idx)
@@ -117,23 +134,17 @@ class Solution
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int n = Convert.ToInt32(Console.ReadLine());
+        string[] nk = Console.ReadLine().Split(' ');
 
-        var queries = new List<List<int>>();
+        int n = Convert.ToInt32(nk[0]);
 
-        for (int queriesItr = 0; queriesItr < n; queriesItr++)
-        {
-            var qLine = Console.ReadLine().Split(' ');
-            var qint = qLine.Where(s => !string.IsNullOrEmpty(s)).Select(q => Convert.ToInt32(q));
-            queries.Add(new List<int>(qint));
-        }
+        int k = Convert.ToInt32(nk[1]);
 
-        int[] result = solve(queries).ToArray();
+        int[] A = Array.ConvertAll(Console.ReadLine().Split(' '), ATemp => Convert.ToInt32(ATemp))
+        ;
+        int result = cookies(k, A);
 
-        foreach (var res in result)
-        {
-            textWriter.WriteLine(res);
-        }
+        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();
