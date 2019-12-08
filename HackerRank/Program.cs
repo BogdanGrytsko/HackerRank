@@ -14,161 +14,104 @@ using System;
 
 class Solution
 {
-    static int cookies(int k, int[] A)
-    {
-        var heap = new MinHeap();
-        foreach (var item in A)
-        {
-            heap.Add(item);
-        }
-        var counter = 0;
-        while (heap.Any() && heap.Root < k)
-        {
-            var item1 = heap.Pop();
-            if (!heap.Any())
-                return -1;
-            var item2 = heap.Pop();
-            var newItem = item1 + 2 * item2;
-            heap.Add(newItem);
-            counter++;
-        }
 
-        return counter;
+    // Complete the balancedForest function below.
+    static long balancedForest(int[] c, int[][] edges)
+    {
+        var tree = new Tree(edges, c);
+        tree.CalcSumsDFS(1);
+
+        var solutions = new List<long>();
+        var s = tree.Sums;
+        var max = s[1];
+        for (int i = 1; i < s.Length; i++)
+        {
+            for (int j = i + 1; j < s.Length; j++)
+            {
+                var s1 = s[i];
+                var s2 = s[j];
+                var s3 = max - s1 - s2;
+                if (s1 == s2 && s3 < s1)
+                    solutions.Add(s1 - s3);
+                if (s1 == s3 && s2 < s1)
+                    solutions.Add(s1 - s2);
+                if (s3 == s2 && s1 < s2)
+                    solutions.Add(s2 - s1);
+            }
+        }
+        if (solutions.Any())
+            return solutions.Min();
+        return -1;
     }
 
-    public class MinHeap
+    public class Tree
     {
-        private readonly List<int> items = new List<int>();
+        private readonly List<List<int>> tree = new List<List<int>>();
+        private readonly int[] verticles;
+        private readonly int[] parent;
+        private readonly long[] sums;
 
-        public void Add(int it)
+        public Tree(int[][] edges, int[] verticles)
         {
-            items.Add(it);
-            FixHeapUp(items.Count - 1);
-#if DEBUG
-            CheckHeapProperty(0);
-#endif
+            this.verticles = verticles;
+            parent = new int[verticles.Length + 1];
+            sums = new long[verticles.Length + 1];
+            Build(edges);
         }
 
-        private void FixHeapUp(int idx)
+        private void Build(int[][] edges)
         {
-            var parentIdx = ParentIdx(idx);
-            var parent = items[parentIdx];
-            var curr = items[idx];
-            if (parent <= curr)
-                return;
-            else
+            for (int i = 0; i <= edges.Length + 1; i++)
+                tree.Add(new List<int>());
+            foreach (var edge in edges)
             {
-                items[parentIdx] = curr;
-                items[idx] = parent;
-                FixHeapUp(parentIdx);
+                tree[edge[0]].Add(edge[1]);
+                tree[edge[1]].Add(edge[0]);
             }
         }
 
-        private static int ParentIdx(int idx)
+        public long CalcSumsDFS(int root)
         {
-            return (idx - 1) / 2;
-        }
-
-        public int Pop()
-        {
-            return RemoveByIdx(0);
-        }
-
-        public void Remove(int it)
-        {
-            //this can be improved by using Dictionary
-            var idx = items.IndexOf(it);
-            RemoveByIdx(idx);
-        }
-
-        private int RemoveByIdx(int idx)
-        {
-            var item = items[idx];
-            items[idx] = items[items.Count - 1];
-            items.RemoveAt(items.Count - 1);
-            if (idx < items.Count)
-                FixHeapDown(idx);
-#if DEBUG
-            CheckHeapProperty(0);
-#endif
-            return item;
-        }
-
-        private void FixHeapDown(int idx)
-        {
-            var curr = items[idx];
-            var childIdx1 = ChildIdx1(idx);
-            if (childIdx1 >= items.Count)
-                return;
-            var childIdx2 = ChildIdx2(idx);
-            var childVal1 = items[childIdx1];
-            var childVal2 = childIdx2 >= items.Count ? int.MaxValue : items[childIdx2];
-            if (curr <= childVal1 && curr <= childVal2)
-                return;
-            else
+            long sum = verticles[root - 1];
+            foreach (var verticle in tree[root])
             {
-                if (childVal1 < childVal2)
+                if (verticle != parent[root])
                 {
-                    items[idx] = childVal1;
-                    items[childIdx1] = curr;
-                    FixHeapDown(childIdx1);
-                }
-                else
-                {
-                    items[idx] = childVal2;
-                    items[childIdx2] = curr;
-                    FixHeapDown(childIdx2);
+                    parent[verticle] = root;
+                    sum += CalcSumsDFS(verticle);
                 }
             }
+            sums[root] = sum;
+            return sum;
         }
 
-        private static int ChildIdx1(int idx)
-        {
-            return idx * 2 + 1;
-        }
-
-        private static int ChildIdx2(int idx)
-        {
-            return idx * 2 + 2;
-        }
-
-        public bool Any()
-        {
-            return items.Any();
-        }
-
-        public int Root => items[0];
-
-        public int BruteForce => items.Min();
-
-        public void CheckHeapProperty(int idx)
-        {
-            if (idx >= items.Count)
-                return;
-            var c1 = ChildIdx1(idx);
-            var c2 = ChildIdx2(idx);
-            if ((c1 < items.Count && items[idx] > items[c1]) || (c2 < items.Count && items[idx] > items[c2]))
-                throw new Exception("Heap is bad");
-            CheckHeapProperty(c1);
-            CheckHeapProperty(c2);
-        }
+        public long[] Sums => sums;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] nk = Console.ReadLine().Split(' ');
+        int q = Convert.ToInt32(Console.ReadLine());
 
-        int n = Convert.ToInt32(nk[0]);
+        for (int qItr = 0; qItr < q; qItr++)
+        {
+            int n = Convert.ToInt32(Console.ReadLine());
 
-        int k = Convert.ToInt32(nk[1]);
-        var input = Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+            int[] c = Array.ConvertAll(Console.ReadLine().Split(' '), cTemp => Convert.ToInt32(cTemp))
+            ;
 
-        int[] A = Array.ConvertAll(input, ATemp => Convert.ToInt32(ATemp));
-        int result = cookies(k, A);
+            int[][] edges = new int[n - 1][];
 
-        textWriter.WriteLine(result);
+            for (int i = 0; i < n - 1; i++)
+            {
+                edges[i] = Array.ConvertAll(Console.ReadLine().Split(' '), edgesTemp => Convert.ToInt32(edgesTemp));
+            }
+
+            var result = balancedForest(c, edges);
+
+            textWriter.WriteLine(result);
+        }
 
         textWriter.Flush();
         textWriter.Close();
