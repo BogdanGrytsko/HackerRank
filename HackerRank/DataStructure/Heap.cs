@@ -1,12 +1,32 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HackerRank.DataStructure
 {
-    public class MinHeap
+    public class Heap : IEnumerable<int>
     {
         private readonly List<int> items = new List<int>();
+        private readonly Func<int, int, bool> comp;
+        private readonly bool minHeap;
+
+        public Heap()
+            : this((i, j) => i <= j)
+        {
+            minHeap = true;
+        }
+
+        public Heap(bool maxHeap)
+            : this((i, j) => i >= j)
+        {
+            minHeap = false;
+        }
+
+        private Heap(Func<int, int, bool> comp)
+        {
+            this.comp = comp;
+        }
 
         public void Add(int it)
         {
@@ -22,7 +42,7 @@ namespace HackerRank.DataStructure
             var parentIdx = ParentIdx(idx);
             var parent = items[parentIdx];
             var curr = items[idx];
-            if (parent <= curr)
+            if (comp(parent, curr))
                 return;
             else
             {
@@ -40,6 +60,22 @@ namespace HackerRank.DataStructure
         public int Pop()
         {
             return RemoveByIdx(0);
+        }
+
+        public int Peek
+        {
+            get
+            {
+                return items[0];
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                return items.Count;
+            }
         }
 
         public void Remove(int it)
@@ -70,12 +106,12 @@ namespace HackerRank.DataStructure
                 return;
             var childIdx2 = ChildIdx2(idx);
             var childVal1 = items[childIdx1];
-            var childVal2 = childIdx2 >= items.Count ? int.MaxValue : items[childIdx2];
-            if (curr <= childVal1 && curr <= childVal2)
+            var childVal2 = childIdx2 >= items.Count ? GetMissingVal() : items[childIdx2];
+            if (comp(curr, childVal1) && comp(curr, childVal2))
                 return;
             else
             {
-                if (childVal1 < childVal2)
+                if (comp(childVal1, childVal2))
                 {
                     items[idx] = childVal1;
                     items[childIdx1] = curr;
@@ -88,6 +124,11 @@ namespace HackerRank.DataStructure
                     FixHeapDown(childIdx2);
                 }
             }
+        }
+
+        private int GetMissingVal()
+        {
+            return minHeap ? int.MaxValue : int.MinValue;
         }
 
         private static int ChildIdx1(int idx)
@@ -107,18 +148,28 @@ namespace HackerRank.DataStructure
 
         public int Root => items[0];
 
-        public int BruteForce => items.Min();
+        public int BruteForce => minHeap ? items.Min() : items.Max();
 
-        public void CheckHeapProperty(int idx)
+        private void CheckHeapProperty(int idx)
         {
             if (idx >= items.Count)
                 return;
             var c1 = ChildIdx1(idx);
             var c2 = ChildIdx2(idx);
-            if ((c1 < items.Count && items[idx] > items[c1]) || (c2 < items.Count && items[idx] > items[c2]))
+            if ((c1 < items.Count && !comp(items[idx], items[c1])) || (c2 < items.Count && !comp(items[idx], items[c2])))
                 throw new Exception("Heap is bad");
             CheckHeapProperty(c1);
             CheckHeapProperty(c2);
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace HackerRank.Problem
             for (int i = 0; i < treapCount; i++)
                 treaps[i] = new Treap(100000);
             for (int i = 0; i < a.Length; i++)
-                treaps[i % treapCount].Append(a[i]);
+                treaps[i % treapCount].Add(a[i]);
             foreach (var query in queries)
             {
                 var l = query[1] - 1;

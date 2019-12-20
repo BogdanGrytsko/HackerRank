@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace HackerRank.DataStructure
 {
-    public class Treap
+    public class Treap : IEnumerable<int>
     {
         private class Item
         {
@@ -33,7 +33,7 @@ namespace HackerRank.DataStructure
         private int size;
         private readonly Random random;
 
-        public Treap(int n)
+        public Treap(int n) 
         {
             items = new List<Item>(n);
             for (int i = 0; i < n; i++)
@@ -152,7 +152,7 @@ namespace HackerRank.DataStructure
             root = Merge(p1, Merge(p2, p3));
         }
 
-        public void Append(int value)
+        public void Add(int value)
         {
             var t = Allocate(value);
             root = Merge(root, t);
@@ -185,6 +185,16 @@ namespace HackerRank.DataStructure
 
             t1.root = Merge(p1, Merge(q2, p3));
             t2.root = Merge(q1, Merge(p2, q3));
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            return InOrder().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return InOrder().GetEnumerator();
         }
     }
 }
