@@ -5,45 +5,69 @@ namespace HackerRank.DataStructure
 {
     public class Tree
     {
-        private readonly List<List<int>> tree = new List<List<int>>();
-        private readonly int[] verticles;
-        private readonly int[] parent;
-        private readonly long[] sums;
-
-        public Tree(int[][] edges, int[] verticles)
+        public class TreeNode
         {
-            this.verticles = verticles;
-            parent = new int[verticles.Length + 1];
-            sums = new long[verticles.Length + 1];
-            Build(edges);
+            public TreeNode Parent { get; set; }
+            public long Sum { get; set; }
+            public int Value { get; set; }
+            public bool Visited { get; set;}
+            public List<int> Edges { get; set; }
+
+            public TreeNode(int val)
+            {
+                Value = val;
+                Sum = val;
+                Edges = new List<int>();
+            }
+
+            public override string ToString()
+            {
+                return $"{Value}, {Sum}";
+            }
         }
 
-        private void Build(int[][] edges)
+        private readonly List<TreeNode> tree = new List<TreeNode>();
+
+        public Tree(int[][] edges, int[] c)
         {
-            for (int i = 0; i <= edges.Length + 1; i++)
-                tree.Add(new List<int>());
+            //to start numeration from 1
+            tree.Add(new TreeNode(-1));
+            for (int i = 0; i < c.Length; i++)
+                tree.Add(new TreeNode(c[i]));
             foreach (var edge in edges)
             {
-                tree[edge[0]].Add(edge[1]);
-                tree[edge[1]].Add(edge[0]);
+                tree[edge[0]].Edges.Add(edge[1]);
+                tree[edge[1]].Edges.Add(edge[0]);
             }
         }
 
-        public long CalcSumsDFS(int root)
+        public void ResetVisited()
         {
-            long sum = verticles[root - 1];
-            foreach (var verticle in tree[root])
+            foreach (var node in tree)
             {
-                if (verticle != parent[root])
-                {
-                    parent[verticle] = root;
-                    sum += CalcSumsDFS(verticle);
-                }
+                node.Visited = false;
             }
-            sums[root] = sum;
-            return sum;
         }
 
-        public long[] Sums => sums;
+        public TreeNode this[int nodeIdx]
+        {
+            get
+            {
+                return tree[nodeIdx];
+            }
+        }
+
+        public long DFSSum(int nodeIdx)
+        {
+            var node = tree[nodeIdx];
+            if (node.Visited)
+                return 0;
+            node.Visited = true;
+            foreach (var edge in node.Edges)
+            {
+                tree[nodeIdx].Sum += DFSSum(edge);
+            }
+            return tree[nodeIdx].Sum;
+        }
     }
 }
