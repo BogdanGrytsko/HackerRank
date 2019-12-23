@@ -18,9 +18,9 @@ namespace HackerRank.Problem
         public long Solve(int[] c, int[][] edges)
         {
             tree = new Tree(edges, c);
-            sum = ans = tree.DFSSum(1);
+            sum = ans = tree.DFSSum(tree.RootIdx);
             tree.ResetVisited();
-            Solve(1);
+            Solve(tree.RootIdx);
             return ans == sum ? -1 : ans;
         }
 

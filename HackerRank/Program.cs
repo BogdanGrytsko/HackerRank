@@ -1,139 +1,101 @@
-﻿using System.CodeDom.Compiler;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
 
 class Solution
 {
-    // Complete the balancedForest function below.
-    static long balancedForest(int[] c, int[][] edges)
+    static int jennysSubtrees(int n, int r, int[][] edges)
     {
-        var sol = new BalancedForest();
-        return sol.Solve(c, edges);
+        return -1;
     }
 
     public class Tree
     {
-        public class TreeNode
+        public class Node
         {
-            public TreeNode Parent { get; set; }
+            public Node Parent { get; set; }
             public long Sum { get; set; }
             public int Value { get; set; }
             public bool Visited { get; set; }
             public List<int> Edges { get; set; }
 
-            public TreeNode(int val)
+            public int Count { get; set; }
+
+            public Node(int val)
             {
                 Value = val;
                 Sum = val;
                 Edges = new List<int>();
+                Count = 1;
             }
 
             public override string ToString()
             {
-                return $"{Value}, {Sum}";
+                return $"V: {Value}, S: {Sum}, C: {Count}, E: {Edges.Count}";
             }
         }
-
-        private readonly List<TreeNode> tree = new List<TreeNode>();
 
         public Tree(int[][] edges, int[] c)
         {
             //to start numeration from 1
-            tree.Add(new TreeNode(-1));
+            Nodes.Add(new Node(-1));
             for (int i = 0; i < c.Length; i++)
-                tree.Add(new TreeNode(c[i]));
+                Nodes.Add(new Node(c[i]));
             foreach (var edge in edges)
             {
-                tree[edge[0]].Edges.Add(edge[1]);
-                tree[edge[1]].Edges.Add(edge[0]);
+                Nodes[edge[0]].Edges.Add(edge[1]);
+                Nodes[edge[1]].Edges.Add(edge[0]);
             }
+            RootIdx = 1;
         }
+
+        public Tree(IEnumerable<Node> nodes, int rootIdx)
+        {
+            RootIdx = rootIdx;
+            Nodes = nodes.ToList();
+        }
+
+        public int RootIdx { get; private set; }
 
         public void ResetVisited()
         {
-            foreach (var node in tree)
+            foreach (var node in Nodes)
             {
                 node.Visited = false;
             }
         }
 
-        public TreeNode this[int nodeIdx]
+        public List<Node> Nodes { get; } = new List<Node>();
+
+        public Node this[int nodeIdx]
         {
             get
             {
-                return tree[nodeIdx];
+                return Nodes[nodeIdx];
             }
         }
 
         public long DFSSum(int nodeIdx)
         {
-            var node = tree[nodeIdx];
+            var node = Nodes[nodeIdx];
             if (node.Visited)
                 return 0;
             node.Visited = true;
             foreach (var edge in node.Edges)
-            {
-                tree[nodeIdx].Sum += DFSSum(edge);
-            }
-            return tree[nodeIdx].Sum;
-        }
-    }
-
-    public class BalancedForest
-    {
-        private Tree tree;
-        private readonly HashSet<long> s, q;
-        private long ans, sum;
-
-        public BalancedForest()
-        {
-            s = new HashSet<long>();
-            q = new HashSet<long>();
+                node.Sum += DFSSum(edge);
+            return node.Sum;
         }
 
-        public long Solve(int[] c, int[][] edges)
+        public int DFSCount(int nodeIdx)
         {
-            tree = new Tree(edges, c);
-            sum = ans = tree.DFSSum(1);
-            tree.ResetVisited();
-            Solve(1);
-            return ans == sum ? -1 : ans;
-        }
-
-        private void Solve(int nodeIdx)
-        {
-            var node = tree[nodeIdx];
+            var node = Nodes[nodeIdx];
             if (node.Visited)
-                return;
+                return 0;
             node.Visited = true;
-            var x = new List<long> { node.Sum * 2, sum * 2 - node.Sum * 4, sum - node.Sum };
-            var y = new List<long> { 3 * node.Sum - sum, x[2] / 2 - node.Sum };
-            var length = x[2] % 2 == 1 ? 2 : 3;
-            for (int i = 0; i < length; i++)
-            {
-                if (s.Contains(x[i] / 2) || q.Contains((x[0] + x[i]) / 2))
-                    ans = Min(ans, y[i / 2]);
-            }
-            q.Add(node.Sum);
-            for (int i = 0; i < node.Edges.Count; i++)
-                Solve(node.Edges[i]);
-            q.Remove(node.Sum);
-            s.Add(node.Sum);
-        }
-
-        private static long Min(long x, long y)
-        {
-            return y >= 0 ? (x < y ? x : y) : x;
+            foreach (var edge in node.Edges)
+                node.Count += DFSCount(edge);
+            return node.Count;
         }
     }
 
@@ -141,26 +103,22 @@ class Solution
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int q = Convert.ToInt32(Console.ReadLine());
+        string[] nr = Console.ReadLine().Split(' ');
 
-        for (int qItr = 0; qItr < q; qItr++)
+        int n = Convert.ToInt32(nr[0]);
+
+        int r = Convert.ToInt32(nr[1]);
+
+        int[][] edges = new int[n - 1][];
+
+        for (int edgesRowItr = 0; edgesRowItr < n - 1; edgesRowItr++)
         {
-            int n = Convert.ToInt32(Console.ReadLine());
-
-            int[] c = Array.ConvertAll(Console.ReadLine().Split(' '), cTemp => Convert.ToInt32(cTemp))
-            ;
-
-            int[][] edges = new int[n - 1][];
-
-            for (int i = 0; i < n - 1; i++)
-            {
-                edges[i] = Array.ConvertAll(Console.ReadLine().Split(' '), edgesTemp => Convert.ToInt32(edgesTemp));
-            }
-
-            var result = balancedForest(c, edges);
-
-            textWriter.WriteLine(result);
+            edges[edgesRowItr] = Array.ConvertAll(Console.ReadLine().Split(' '), edgesTemp => Convert.ToInt32(edgesTemp));
         }
+
+        int result = jennysSubtrees(n, r, edges);
+
+        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();

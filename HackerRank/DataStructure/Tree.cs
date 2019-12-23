@@ -1,73 +1,94 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace HackerRank.DataStructure
 {
     public class Tree
     {
-        public class TreeNode
+        public class Node
         {
-            public TreeNode Parent { get; set; }
+            public Node Parent { get; set; }
             public long Sum { get; set; }
             public int Value { get; set; }
             public bool Visited { get; set;}
             public List<int> Edges { get; set; }
 
-            public TreeNode(int val)
+            public int Count { get; set; }
+
+            public Node(int val)
             {
                 Value = val;
                 Sum = val;
                 Edges = new List<int>();
+                Count = 1;
             }
 
             public override string ToString()
             {
-                return $"{Value}, {Sum}";
+                return $"V: {Value}, S: {Sum}, C: {Count}, E: {Edges.Count}";
             }
         }
-
-        private readonly List<TreeNode> tree = new List<TreeNode>();
 
         public Tree(int[][] edges, int[] c)
         {
             //to start numeration from 1
-            tree.Add(new TreeNode(-1));
+            Nodes.Add(new Node(-1));
             for (int i = 0; i < c.Length; i++)
-                tree.Add(new TreeNode(c[i]));
+                Nodes.Add(new Node(c[i]));
             foreach (var edge in edges)
             {
-                tree[edge[0]].Edges.Add(edge[1]);
-                tree[edge[1]].Edges.Add(edge[0]);
+                Nodes[edge[0]].Edges.Add(edge[1]);
+                Nodes[edge[1]].Edges.Add(edge[0]);
             }
+            RootIdx = 1;
         }
+
+        public Tree(IEnumerable<Node> nodes, int rootIdx)
+        {
+            RootIdx = rootIdx;
+            Nodes = nodes.ToList();
+        }
+
+        public int RootIdx { get; private set; }
 
         public void ResetVisited()
         {
-            foreach (var node in tree)
+            foreach (var node in Nodes)
             {
                 node.Visited = false;
             }
         }
 
-        public TreeNode this[int nodeIdx]
+        public List<Node> Nodes { get; } = new List<Node>();
+
+        public Node this[int nodeIdx]
         {
             get
             {
-                return tree[nodeIdx];
+                return Nodes[nodeIdx];
             }
         }
 
         public long DFSSum(int nodeIdx)
         {
-            var node = tree[nodeIdx];
+            var node = Nodes[nodeIdx];
             if (node.Visited)
                 return 0;
             node.Visited = true;
             foreach (var edge in node.Edges)
-            {
-                tree[nodeIdx].Sum += DFSSum(edge);
-            }
-            return tree[nodeIdx].Sum;
+                node.Sum += DFSSum(edge);
+            return node.Sum;
+        }
+
+        public int DFSCount(int nodeIdx)
+        {
+            var node = Nodes[nodeIdx];
+            if (node.Visited)
+                return 0;
+            node.Visited = true;
+            foreach (var edge in node.Edges)
+                node.Count += DFSCount(edge);
+            return node.Count;
         }
     }
 }
