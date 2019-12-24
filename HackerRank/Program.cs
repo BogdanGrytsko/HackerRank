@@ -1,124 +1,47 @@
-﻿using System;
+﻿using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
 
 class Solution
 {
-    static int jennysSubtrees(int n, int r, int[][] edges)
+
+    // Complete the alternatingCharacters function below.
+    static int alternatingCharacters(string s)
     {
-        return -1;
-    }
-
-    public class Tree
-    {
-        public class Node
+        if (s.Length == 1) return 0;
+        var cnt = 0;
+        for (int i = 1; i < s.Length; i++)
         {
-            public Node Parent { get; set; }
-            public long Sum { get; set; }
-            public int Value { get; set; }
-            public bool Visited { get; set; }
-            public List<int> Edges { get; set; }
-
-            public int Count { get; set; }
-
-            public Node(int val)
-            {
-                Value = val;
-                Sum = val;
-                Edges = new List<int>();
-                Count = 1;
-            }
-
-            public override string ToString()
-            {
-                return $"V: {Value}, S: {Sum}, C: {Count}, E: {Edges.Count}";
-            }
+            if (s[i - 1] == s[i])
+                cnt++;
         }
-
-        public Tree(int[][] edges, int[] c)
-        {
-            //to start numeration from 1
-            Nodes.Add(new Node(-1));
-            for (int i = 0; i < c.Length; i++)
-                Nodes.Add(new Node(c[i]));
-            foreach (var edge in edges)
-            {
-                Nodes[edge[0]].Edges.Add(edge[1]);
-                Nodes[edge[1]].Edges.Add(edge[0]);
-            }
-            RootIdx = 1;
-        }
-
-        public Tree(IEnumerable<Node> nodes, int rootIdx)
-        {
-            RootIdx = rootIdx;
-            Nodes = nodes.ToList();
-        }
-
-        public int RootIdx { get; private set; }
-
-        public void ResetVisited()
-        {
-            foreach (var node in Nodes)
-            {
-                node.Visited = false;
-            }
-        }
-
-        public List<Node> Nodes { get; } = new List<Node>();
-
-        public Node this[int nodeIdx]
-        {
-            get
-            {
-                return Nodes[nodeIdx];
-            }
-        }
-
-        public long DFSSum(int nodeIdx)
-        {
-            var node = Nodes[nodeIdx];
-            if (node.Visited)
-                return 0;
-            node.Visited = true;
-            foreach (var edge in node.Edges)
-                node.Sum += DFSSum(edge);
-            return node.Sum;
-        }
-
-        public int DFSCount(int nodeIdx)
-        {
-            var node = Nodes[nodeIdx];
-            if (node.Visited)
-                return 0;
-            node.Visited = true;
-            foreach (var edge in node.Edges)
-                node.Count += DFSCount(edge);
-            return node.Count;
-        }
+        return cnt;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] nr = Console.ReadLine().Split(' ');
+        int q = Convert.ToInt32(Console.ReadLine());
 
-        int n = Convert.ToInt32(nr[0]);
-
-        int r = Convert.ToInt32(nr[1]);
-
-        int[][] edges = new int[n - 1][];
-
-        for (int edgesRowItr = 0; edgesRowItr < n - 1; edgesRowItr++)
+        for (int qItr = 0; qItr < q; qItr++)
         {
-            edges[edgesRowItr] = Array.ConvertAll(Console.ReadLine().Split(' '), edgesTemp => Convert.ToInt32(edgesTemp));
+            string s = Console.ReadLine();
+
+            int result = alternatingCharacters(s);
+
+            textWriter.WriteLine(result);
         }
-
-        int result = jennysSubtrees(n, r, edges);
-
-        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();
