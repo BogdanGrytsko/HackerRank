@@ -32,6 +32,7 @@ namespace XTest
             treap.Reverse(2, 4);
             treap.Reverse(1, 3);
             Assert.Equal(1, treap[0]);
+            Assert.Equal(4, treap[1]);
             Assert.Equal(5, treap[2]);
             Assert.Equal(2, treap[3]);
             Assert.Equal(3, treap[4]);

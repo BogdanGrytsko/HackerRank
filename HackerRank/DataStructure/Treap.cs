@@ -163,6 +163,9 @@ namespace HackerRank.DataStructure
             Split(p2, l, ref p1, ref p2);
             Revert(p2);
             root = Merge(p1, Merge(p2, p3));
+#if DEBUG
+            CheckTreeProperty(root);
+#endif
         }
 
         public int GetIdx(int value)
@@ -176,6 +179,9 @@ namespace HackerRank.DataStructure
         {
             var t = Allocate(value);
             root = Merge(root, t);
+#if DEBUG
+            CheckTreeProperty(root);
+#endif
         }
 
         public IEnumerable<int> InOrder()
@@ -215,6 +221,15 @@ namespace HackerRank.DataStructure
         IEnumerator IEnumerable.GetEnumerator()
         {
             return InOrder().GetEnumerator();
+        }
+
+        private static void CheckTreeProperty(Node node)
+        {
+            if (node == null) return;
+            if (node.Left?.Value > node.Value || node.Right?.Value < node.Value)
+                throw new Exception("Tree is not binary sorted");
+            CheckTreeProperty(node.Left);
+            CheckTreeProperty(node.Right);
         }
     }
 }
