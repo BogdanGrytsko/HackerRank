@@ -11,9 +11,9 @@ namespace HackerRank.Problem
         public static IEnumerable<long> Solve(int[] a, IEnumerable<int[]> queries)
         {
             var treapCount = 2;
-            var treaps = new Treap[treapCount];
+            var treaps = new ImplicitTreap[treapCount];
             for (int i = 0; i < treapCount; i++)
-                treaps[i] = new Treap(100000);
+                treaps[i] = new ImplicitTreap(100000);
             for (int i = 0; i < a.Length; i++)
                 treaps[i % treapCount].Add(a[i]);
             foreach (var query in queries)
@@ -39,7 +39,7 @@ namespace HackerRank.Problem
                 }
 
                 if (t == 1)
-                    Treap.TSwap(ref treaps[0], ql[0], qr[0], ref treaps[1], ql[1], qr[1]);
+                    ImplicitTreap.TSwap(ref treaps[0], ql[0], qr[0], ref treaps[1], ql[1], qr[1]);
                 else
                 {
                     long ans = 0;
@@ -52,6 +52,7 @@ namespace HackerRank.Problem
                 }
             }
         }
+
 
         public void Main()
         {

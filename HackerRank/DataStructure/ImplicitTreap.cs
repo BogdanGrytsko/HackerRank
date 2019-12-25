@@ -4,16 +4,16 @@ using System.Collections.Generic;
 
 namespace HackerRank.DataStructure
 {
-    public class Treap : IEnumerable<int>
+    public class ImplicitTreap : IEnumerable<int>
     {
-        private class Node
+        public class Node
         {
             public int Priority { get; set; }
             public int Value { get; set; }
             public int Count { get; set; }
             public long Sum { get; set; }
             public bool Reverse { get; set; }
-            public Node Left, Right;
+            public Node Left, Right, Parent;
 
             public void Swap()
             {
@@ -24,21 +24,20 @@ namespace HackerRank.DataStructure
 
             public override string ToString()
             {
-                return $"{Value}, C:{Count}, L:{Left?.Value}, R:{Right?.Value}";
+                return $"{Value}, C:{Count}, L:{Left?.Value}, R:{Right?.Value}, P:{Parent?.Value}";
             }
         }
 
-        private readonly List<Node> nodes;
         private Node root;
         private int size;
         private readonly Random random;
 
-        public Treap(int n) 
+        public ImplicitTreap(int n) 
         {
-            nodes = new List<Node>(n);
+            Nodes = new List<Node>(n);
             for (int i = 0; i < n; i++)
             {
-                nodes.Add(new Node());
+                Nodes.Add(new Node());
             }
             root = null;
             random = new Random();
@@ -46,7 +45,7 @@ namespace HackerRank.DataStructure
 
         private Node Allocate(int value)
         {
-            var it = nodes[size++];
+            var it = Nodes[size++];
             it.Priority = random.Next();
             it.Value = value;
             it.Sum = value;
@@ -75,11 +74,34 @@ namespace HackerRank.DataStructure
             if (t == null) return;
             if (t.Reverse)
             {
+                t.Reverse = false;
                 t.Swap();
                 Revert(t.Left);
                 Revert(t.Right);
-                Revert(t);
             }
+        }
+
+        public int GetIdx(Node node)
+        {
+            PushUp(node);
+            return GetIdxInternal(node);
+        }
+
+        private void PushUp(Node node)
+        {
+            if (node.Parent != null)
+                PushUp(node.Parent);
+            Push(node);
+        }
+
+        private int GetIdxInternal(Node node)
+        {
+            if (node.Parent == null)
+                return Count(node.Left);
+            if (node.Parent.Left == node)
+                return GetIdxInternal(node.Parent) - Count(node.Right) - 1;
+            else
+                return GetIdxInternal(node.Parent) + Count(node.Left) + 1;
         }
 
         private static void Update(Node t)
@@ -114,19 +136,21 @@ namespace HackerRank.DataStructure
 
         private static Node Merge(Node l, Node r)
         {
+            Node t;
             Push(l);
             Push(r);
             if (l == null || r == null)
-                return l == null ? r : l;
-            Node t;
-            if (l.Priority > r.Priority)
+                t = l != null ? l : r;
+            else if (l.Priority > r.Priority)
             {
                 l.Right = Merge(l.Right, r);
+                l.Right.Parent = l;
                 t = l;
             }
             else
             {
                 r.Left = Merge(l, r.Left);
+                r.Left.Parent = r;
                 t = r;
             }
             Update(t);
@@ -158,30 +182,22 @@ namespace HackerRank.DataStructure
 
         public void Reverse(int l, int r)
         {
+            CheckParent(root);
             Node p1 = null, p2 = null, p3 = null;
             Split(root, r + 1, ref p2, ref p3);
+            CheckParent(root);
             Split(p2, l, ref p1, ref p2);
+            CheckParent(root);
             Revert(p2);
+            CheckParent(root);
             root = Merge(p1, Merge(p2, p3));
-#if DEBUG
-            CheckTreeProperty(root);
-#endif
-        }
-
-        public int GetIdx(int value)
-        {
-            //todo find node via binary search
-            var node = nodes.Find(n => n.Value == value);
-            return Count(node.Left);
+            CheckParent(root);
         }
 
         public void Add(int value)
         {
             var t = Allocate(value);
             root = Merge(root, t);
-#if DEBUG
-            CheckTreeProperty(root);
-#endif
         }
 
         public IEnumerable<int> InOrder()
@@ -200,7 +216,7 @@ namespace HackerRank.DataStructure
                 yield return item;
         }
 
-        public static void TSwap(ref Treap t1, int l1, int r1, ref Treap t2, int l2, int r2)
+        public static void TSwap(ref ImplicitTreap t1, int l1, int r1, ref ImplicitTreap t2, int l2, int r2)
         {
             Node p1 = null, p2 = null, p3 = null, q1 = null, q2 = null, q3 = null;
             Split(t1.root, r1 + 1, ref p2, ref p3);
@@ -213,6 +229,8 @@ namespace HackerRank.DataStructure
             t2.root = Merge(q1, Merge(p2, q3));
         }
 
+        public List<Node> Nodes { get; }
+
         public IEnumerator<int> GetEnumerator()
         {
             return InOrder().GetEnumerator();
@@ -223,13 +241,13 @@ namespace HackerRank.DataStructure
             return InOrder().GetEnumerator();
         }
 
-        private static void CheckTreeProperty(Node node)
+        private static void CheckParent(Node node)
         {
             if (node == null) return;
-            if (node.Left?.Value > node.Value || node.Right?.Value < node.Value)
-                throw new Exception("Tree is not binary sorted");
-            CheckTreeProperty(node.Left);
-            CheckTreeProperty(node.Right);
+            if ((node.Left != null && node.Left.Parent != node) || (node.Right != null) && node.Right.Parent != node)
+                throw new Exception("bad parent");
+            CheckParent(node.Left);
+            CheckParent(node.Right);
         }
     }
 }

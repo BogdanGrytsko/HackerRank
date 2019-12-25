@@ -1,49 +1,41 @@
-﻿using System.CodeDom.Compiler;
+﻿using HackerRank.Problem;
+using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
 
 class Solution
 {
-
-    // Complete the alternatingCharacters function below.
-    static int alternatingCharacters(string s)
+    public static IEnumerable<string> Solve(int n, int[][] queries)
     {
-        if (s.Length == 1) return 0;
-        var cnt = 0;
-        for (int i = 1; i < s.Length; i++)
-        {
-            if (s[i - 1] == s[i])
-                cnt++;
-        }
-        return cnt;
+        var sol = new CrazyHelix();
+        return sol.Solve(n, queries);
     }
 
-    static void Main(string[] args)
+    static void Main(String[] args)
     {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int q = Convert.ToInt32(Console.ReadLine());
+        string[] nq = Console.ReadLine().Split(' ');
 
-        for (int qItr = 0; qItr < q; qItr++)
+        int n = Convert.ToInt32(nq[0]);
+
+        int q = Convert.ToInt32(nq[1]);
+
+        int[][] queries = new int[q][];
+
+        for (int queriesRowItr = 0; queriesRowItr < q; queriesRowItr++)
         {
-            string s = Console.ReadLine();
-
-            int result = alternatingCharacters(s);
-
-            textWriter.WriteLine(result);
+            queries[queriesRowItr] = Array.ConvertAll(Console.ReadLine().Split(' '), queriesTemp => Convert.ToInt32(queriesTemp));
         }
+
+        var result = Solve(n, queries).ToArray();
+
+        textWriter.WriteLine(string.Join("\n", result));
 
         textWriter.Flush();
         textWriter.Close();
     }
 }
+
