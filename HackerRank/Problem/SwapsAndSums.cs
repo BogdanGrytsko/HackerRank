@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using static HackerRank.DataStructure.ImplicitTreap;
 
 namespace HackerRank.Problem
 {
@@ -39,7 +40,7 @@ namespace HackerRank.Problem
                 }
 
                 if (t == 1)
-                    ImplicitTreap.TSwap(ref treaps[0], ql[0], qr[0], ref treaps[1], ql[1], qr[1]);
+                    TSwap(ref treaps[0], ql[0], qr[0], ref treaps[1], ql[1], qr[1]);
                 else
                 {
                     long ans = 0;
@@ -53,6 +54,19 @@ namespace HackerRank.Problem
             }
         }
 
+        public static void TSwap(ref ImplicitTreap t1, int l1, int r1, ref ImplicitTreap t2, int l2, int r2)
+        {
+            TreapNode p1 = null, p2 = null, p3 = null, q1 = null, q2 = null, q3 = null;
+            Split(t1.Root, r1 + 1, ref p2, ref p3);
+            Split(p2, l1, ref p1, ref p2);
+
+            Split(t2.Root, r2 + 1, ref q2, ref q3);
+            Split(q2, l2, ref q1, ref q2);
+
+            t1.Root = Merge(p1, Merge(q2, p3));
+            t2.Root = Merge(q1, Merge(p2, q3));
+        }
+
 
         public void Main()
         {
@@ -64,7 +78,7 @@ namespace HackerRank.Problem
 
             int q = Convert.ToInt32(nq[1]);
 
-            int[] a = Array.ConvertAll(Console.ReadLine().Split(' '), aTemp => Convert.ToInt32(aTemp))            ;
+            int[] a = Array.ConvertAll(Console.ReadLine().Split(' '), aTemp => Convert.ToInt32(aTemp));
 
             int[][] queries = new int[q][];
 

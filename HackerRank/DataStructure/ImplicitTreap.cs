@@ -6,14 +6,14 @@ namespace HackerRank.DataStructure
 {
     public class ImplicitTreap : IEnumerable<int>
     {
-        public class Node
+        public class TreapNode
         {
             public int Priority { get; set; }
             public int Value { get; set; }
             public int Count { get; set; }
             public long Sum { get; set; }
             public bool Reverse { get; set; }
-            public Node Left, Right, Parent;
+            public TreapNode Left, Right, Parent;
 
             public void Swap()
             {
@@ -28,22 +28,23 @@ namespace HackerRank.DataStructure
             }
         }
 
-        private Node root;
         private int size;
         private readonly Random random;
 
+        public TreapNode Root { get; set; }
+
         public ImplicitTreap(int n) 
         {
-            Nodes = new List<Node>(n);
+            Nodes = new List<TreapNode>(n);
             for (int i = 0; i < n; i++)
             {
-                Nodes.Add(new Node());
+                Nodes.Add(new TreapNode());
             }
-            root = null;
+            Root = null;
             random = new Random();
         }
 
-        private Node Allocate(int value)
+        private TreapNode Allocate(int value)
         {
             var it = Nodes[size++];
             it.Priority = random.Next();
@@ -53,23 +54,23 @@ namespace HackerRank.DataStructure
             return it;
         }
 
-        private static int Count(Node t)
+        private static int Count(TreapNode t)
         {
             return t != null ? t.Count : 0;
         }
 
-        private static long Sum(Node t)
+        private static long Sum(TreapNode t)
         {
             return t != null ? t.Sum : 0;
         }
 
-        private static void Revert(Node t)
+        private static void Revert(TreapNode t)
         {
             if (t != null)
                 t.Reverse = !t.Reverse;
         }
 
-        private static void Push(Node t)
+        private static void Push(TreapNode t)
         {
             if (t == null) return;
             if (t.Reverse)
@@ -81,20 +82,20 @@ namespace HackerRank.DataStructure
             }
         }
 
-        public int GetIdx(Node node)
+        public int GetIdx(TreapNode node)
         {
             PushUp(node);
             return GetIdxInternal(node);
         }
 
-        private void PushUp(Node node)
+        private void PushUp(TreapNode node)
         {
             if (node.Parent != null)
                 PushUp(node.Parent);
             Push(node);
         }
 
-        private int GetIdxInternal(Node node)
+        private int GetIdxInternal(TreapNode node)
         {
             if (node.Parent == null)
                 return Count(node.Left);
@@ -104,14 +105,14 @@ namespace HackerRank.DataStructure
                 return GetIdxInternal(node.Parent) + Count(node.Left) + 1;
         }
 
-        private static void Update(Node t)
+        private static void Update(TreapNode t)
         {
             if (t == null) return;
             t.Count = Count(t.Left) + Count(t.Right) + 1;
             t.Sum = Sum(t.Left) + Sum(t.Right) + t.Value;
         }
 
-        private static void Split(Node t, int key, ref Node l, ref Node r)
+        public static void Split(TreapNode t, int key, ref TreapNode l, ref TreapNode r)
         {
             Push(t);
             if (t == null)
@@ -134,9 +135,9 @@ namespace HackerRank.DataStructure
             Update(r);
         }
 
-        private static Node Merge(Node l, Node r)
+        public static TreapNode Merge(TreapNode l, TreapNode r)
         {
-            Node t;
+            TreapNode t;
             Push(l);
             Push(r);
             if (l == null || r == null)
@@ -159,11 +160,11 @@ namespace HackerRank.DataStructure
 
         public long Sum(int l, int r)
         {
-            Node p1 = null, p2 = null, p3 = null;
-            Split(root, r + 1, ref p2, ref p3);
+            TreapNode p1 = null, p2 = null, p3 = null;
+            Split(Root, r + 1, ref p2, ref p3);
             Split(p2, l, ref p1, ref p2);
             var ans = Sum(p2);
-            root = Merge(p1, Merge(p2, p3));
+            Root = Merge(p1, Merge(p2, p3));
             return ans;
         }
 
@@ -171,41 +172,41 @@ namespace HackerRank.DataStructure
         {
             get
             {
-                Node p1 = null, p2 = null, p3 = null;
-                Split(root, idx + 1, ref p2, ref p3);
+                TreapNode p1 = null, p2 = null, p3 = null;
+                Split(Root, idx + 1, ref p2, ref p3);
                 Split(p2, idx, ref p1, ref p2);
                 var ans = p2.Value;
-                root = Merge(p1, Merge(p2, p3));
+                Root = Merge(p1, Merge(p2, p3));
                 return ans;
             }
         }
 
         public void Reverse(int l, int r)
         {
-            CheckParent(root);
-            Node p1 = null, p2 = null, p3 = null;
-            Split(root, r + 1, ref p2, ref p3);
-            CheckParent(root);
+            CheckParent(Root);
+            TreapNode p1 = null, p2 = null, p3 = null;
+            Split(Root, r + 1, ref p2, ref p3);
+            CheckParent(Root);
             Split(p2, l, ref p1, ref p2);
-            CheckParent(root);
+            CheckParent(Root);
             Revert(p2);
-            CheckParent(root);
-            root = Merge(p1, Merge(p2, p3));
-            CheckParent(root);
+            CheckParent(Root);
+            Root = Merge(p1, Merge(p2, p3));
+            CheckParent(Root);
         }
 
         public void Add(int value)
         {
             var t = Allocate(value);
-            root = Merge(root, t);
+            Root = Merge(Root, t);
         }
 
         public IEnumerable<int> InOrder()
         {
-            return InOrder(root);
+            return InOrder(Root);
         }
 
-        private static IEnumerable<int> InOrder(Node t)
+        private static IEnumerable<int> InOrder(TreapNode t)
         {
             if (t == null) yield break;
             Push(t);
@@ -216,20 +217,9 @@ namespace HackerRank.DataStructure
                 yield return item;
         }
 
-        public static void TSwap(ref ImplicitTreap t1, int l1, int r1, ref ImplicitTreap t2, int l2, int r2)
-        {
-            Node p1 = null, p2 = null, p3 = null, q1 = null, q2 = null, q3 = null;
-            Split(t1.root, r1 + 1, ref p2, ref p3);
-            Split(p2, l1, ref p1, ref p2);
 
-            Split(t2.root, r2 + 1, ref q2, ref q3);
-            Split(q2, l2, ref q1, ref q2);
 
-            t1.root = Merge(p1, Merge(q2, p3));
-            t2.root = Merge(q1, Merge(p2, q3));
-        }
-
-        public List<Node> Nodes { get; }
+        public List<TreapNode> Nodes { get; }
 
         public IEnumerator<int> GetEnumerator()
         {
@@ -241,7 +231,7 @@ namespace HackerRank.DataStructure
             return InOrder().GetEnumerator();
         }
 
-        private static void CheckParent(Node node)
+        private static void CheckParent(TreapNode node)
         {
             if (node == null) return;
             if ((node.Left != null && node.Left.Parent != node) || (node.Right != null) && node.Right.Parent != node)
