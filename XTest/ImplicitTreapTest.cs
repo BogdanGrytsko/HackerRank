@@ -9,7 +9,7 @@ namespace XTest
     public class ImplicitTreapTest
     {
         [Fact]
-        public void Swaps_Ans_Sums_Correct()
+        public void Swaps_Ans_Sums()
         {
             var arr = new[] { 1, 2, 3, 4, 5, 6 };
             var queries = new List<int[]>()
