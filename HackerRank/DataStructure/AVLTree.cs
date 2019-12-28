@@ -9,6 +9,7 @@ public class AVLTree : IEnumerable<int>
         public int Key { get; set; }
         public int Height { get; set; }
         public int Count { get; set; }
+        public int SameKeyCnt { get; set; }
         public AVLNode Left { get; set; }
         public AVLNode Right { get; set; }
 
@@ -17,6 +18,7 @@ public class AVLTree : IEnumerable<int>
             Key = key;
             Height = 1;
             Count = 1;
+            SameKeyCnt = 1;
         }
 
         public override string ToString()
@@ -61,23 +63,23 @@ public class AVLTree : IEnumerable<int>
     {
         var lc = Count(n.Left) + lSeed;
         var rc = Count(n.Right) + rSeed;
-        if (lc == rc)
+        if (Math.Abs(lc - rc) <= n.SameKeyCnt - 1)
             return n.Key;
-        if (lc + 1 == rc)
-            return ((double)n.Key + n.Right.Key) / 2;
-        if (lc == 1 + rc)
-            return ((double)n.Key + n.Left.Key) / 2;
+        if (lc + n.SameKeyCnt == rc)
+            return ((double)n.Key + LeftMost(n.Right).Key) / 2;
+        if (lc == n.SameKeyCnt + rc)
+            return ((double)n.Key + RightMost(n.Left).Key) / 2;
         if (lc > rc)
-            return GetMedian(n.Left, lSeed, rc + 1);
+            return GetMedian(n.Left, lSeed, rc + n.SameKeyCnt);
         if (lc < rc)
-            return GetMedian(n.Right, lc + 1, rSeed);
+            return GetMedian(n.Right, lc + n.SameKeyCnt, rSeed);
         throw new Exception("Should never happen");
     }
 
     private static void Update(AVLNode n)
     {
         n.Height = Math.Max(Height(n.Left), Height(n.Right)) + 1;
-        n.Count = Count(n.Left) + Count(n.Right) + 1;
+        n.Count = Count(n.Left) + Count(n.Right) + n.SameKeyCnt;
     }
 
     private static AVLNode LeftRotate(AVLNode x)
@@ -110,10 +112,12 @@ public class AVLTree : IEnumerable<int>
         if (n == null)
             return new AVLNode(key);
 
-        if (key <= n.Key)
+        if (key < n.Key)
             n.Left = Insert(n.Left, key);
         else if (key > n.Key)
             n.Right = Insert(n.Right, key);
+        else
+            n.SameKeyCnt++;
 
         Update(n);
 
@@ -136,13 +140,19 @@ public class AVLTree : IEnumerable<int>
         return n;
     }
 
-    private static AVLNode MinValueNode(AVLNode node)
+    private static AVLNode LeftMost(AVLNode node)
     {
         var current = node;
-
         while (current.Left != null)
             current = current.Left;
+        return current;
+    }
 
+    private static AVLNode RightMost(AVLNode node)
+    {
+        var current = node;
+        while (current.Right != null)
+            current = current.Right;
         return current;
     }
 
@@ -175,6 +185,10 @@ public class AVLTree : IEnumerable<int>
             root.Left= DeleteNode(root.Left, key);
         else if (key > root.Key)
             root.Right = DeleteNode(root.Right, key);
+        else if (root.SameKeyCnt > 1)
+        {
+            root.SameKeyCnt--;
+        }
         else
         {
             if ((root.Left== null) || (root.Right == null))
@@ -195,7 +209,7 @@ public class AVLTree : IEnumerable<int>
             }
             else
             {
-                var temp = MinValueNode(root.Right);
+                var temp = LeftMost(root.Right);
                 root.Key = temp.Key;
                 root.Right = DeleteNode(root.Right, temp.Key);
             }
@@ -237,7 +251,8 @@ public class AVLTree : IEnumerable<int>
             yield break;
         foreach (var v in InOrder(node.Left))
             yield return v;
-        yield return node.Key;
+        for (int i = 0; i < node.SameKeyCnt; i++)
+            yield return node.Key;
         foreach (var v in InOrder(node.Right))
             yield return v;
     }
