@@ -15,67 +15,43 @@ using System;
 class Solution
 {
 
-    // Complete the minimumBribes function below.
-    static void minimumBribes(int[] q)
+    // Complete the minimumSwaps function below.
+    static int minimumSwaps(int[] a)
     {
-        var bribe = new int[q.Length + 1];
-        var bribes = 0;
-        for (int i = 0; i < q.Length; i++)
+        var swaps = 0;
+        var dic = new Dictionary<int, int>();
+        for (int i = 0; i < a.Length; i++)
         {
-            if (q[i] - i == 1) continue;
-            var pos = GetPos(q, i + 1);
-            if (!MarkBribed(bribe, q, i, pos))
-            {
-                Console.WriteLine("Too chaotic");
-                return;
-            }
-            ShiftValueLeft(q, i, pos);
-            bribes += pos - i;
+            dic[a[i]] = i;
         }
-        Console.WriteLine(bribes);
-    }
+        for (int i = 0; i < a.Length; i++)
+        {
+            if (a[i] - i == 1) continue;
+            var swapPos = dic[i + 1];
+            var tmp = a[swapPos];
+            a[swapPos] = a[i];
+            a[i] = tmp;
 
-    private static int GetPos(int[] q, int value)
-    {
-        for (int i = value; i < q.Length; i++)
-        {
-            if (q[i] == value)
-                return i;
+            dic[a[i]] = i;
+            dic[a[swapPos]] = swapPos;
+            swaps++;
         }
-        throw new NotImplementedException();
-    }
-
-    private static void ShiftValueLeft(int[] q, int start, int end)
-    {
-        var tmp = q[end];
-        for (int i = end; i > start; i--)
-        {
-            q[i] = q[i - 1];
-        }
-        q[start] = tmp;
-    }
-
-    private static bool MarkBribed(int[] bribe, int[] q, int start, int end)
-    {
-        for (int i = start; i <= end; i++)
-        {
-            if (++bribe[q[i]] > 2)
-                return false;
-        }
-        return true;
+        return swaps;
     }
 
     static void Main(string[] args)
     {
-        int t = Convert.ToInt32(Console.ReadLine());
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        for (int tItr = 0; tItr < t; tItr++)
-        {
-            int n = Convert.ToInt32(Console.ReadLine());
+        int n = Convert.ToInt32(Console.ReadLine());
 
-            int[] q = Array.ConvertAll(Console.ReadLine().Split(' '), qTemp => Convert.ToInt32(qTemp))
-            ;
-            minimumBribes(q);
-        }
+        int[] arr = Array.ConvertAll(Console.ReadLine().Split(' '), arrTemp => Convert.ToInt32(arrTemp))
+        ;
+        int res = minimumSwaps(arr);
+
+        textWriter.WriteLine(res);
+
+        textWriter.Flush();
+        textWriter.Close();
     }
 }
