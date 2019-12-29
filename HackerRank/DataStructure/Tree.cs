@@ -7,10 +7,14 @@ namespace HackerRank.DataStructure
     {
         public class Node
         {
-            public Node Parent { get; set; }
+            public int ParentIdx { get; set; }
             public long Sum { get; set; }
             public int Value { get; set; }
-            public bool Visited { get; set;}
+            public bool Visited { get; set; }
+            public int Depth { get; set; }
+            public int HeavyIdx { get; set; }
+            public int HeadIdx { get; set; }
+            public int PosIdx { get; set; }
             public List<int> Edges { get; set; }
 
             public int Count { get; set; }
@@ -20,6 +24,7 @@ namespace HackerRank.DataStructure
                 Value = val;
                 Sum = val;
                 Edges = new List<int>();
+                HeavyIdx = -1;
                 Count = 1;
             }
 
