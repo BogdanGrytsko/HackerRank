@@ -1,85 +1,75 @@
-﻿using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
 using System;
 
 class Solution
 {
 
-    // Complete the countTriplets function below.
-    static long countTriplets(List<long> arr, long r)
+    // Complete the freqQuery function below.
+    static IEnumerable<int> freqQuery(List<List<int>> queries)
     {
-        long triplets = 0;
-        var dupletDic = new Dictionary<long, long>();
-        var tripletDic = new Dictionary<long, long>();
-        foreach (var it in arr)
+        var valDic = new Dictionary<int, long>();
+        var freqDic = new Dictionary<long, HashSet<int>>();
+        for (int j = 0; j < queries.Count; j++)
         {
-            var dupKey = it / r;
-            if (tripletDic.TryGetValue(dupKey, out var dupCnt) && it % r == 0)
-                triplets += dupCnt;
-            if (dupletDic.TryGetValue(dupKey, out var cnt) && it % r == 0)
-                AddToDic(tripletDic, it, cnt);
-            AddToDic(dupletDic, it);
-        }
-        return triplets;
-    }
+            var query = queries[j];
+            var val = query[1];
+            if (query[0] == 1)
+            {
+                long prevFreq = -1;
+                if (!valDic.ContainsKey(val) || valDic[val] == 0)
+                    valDic[val] = 1;
+                else
+                {
+                    prevFreq = valDic[val];
+                    valDic[val]++;
+                }
+                var freq = valDic[val];
+                if (!freqDic.ContainsKey(freq))
+                    freqDic.Add(freq, new HashSet<int> { val });
+                else
+                    freqDic[freq].Add(val);
 
-    public static void AddToDic<TKey>(IDictionary<TKey, long> dic, TKey key, long val = 1)
-    {
-        if (dic.ContainsKey(key))
-            dic[key] += val;
-        else
-            dic[key] = val;
+                if (prevFreq != -1)
+                    freqDic[prevFreq].Remove(val);
+            }
+            else if (query[0] == 2)
+            {
+                if (!valDic.ContainsKey(val) || valDic[val] == 0) continue;
+                var freq = valDic[val];
+                valDic[val]--;
+                freqDic[freq].Remove(val);
+                if (freq > 1)
+                    freqDic[freq - 1].Add(val);
+            }
+            else if (query[0] == 3)
+            {
+                HashSet<int> freqSet;
+                if (freqDic.TryGetValue(val, out freqSet) && freqSet.Any())
+                    yield return 1;
+                else
+                    yield return 0;
+            }
+        }
     }
 
     static void Main(string[] args)
     {
-        //ReadFromFile();
-        //return;
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] nr = Console.ReadLine().TrimEnd().Split(' ');
+        int q = Convert.ToInt32(Console.ReadLine().Trim());
 
-        int n = Convert.ToInt32(nr[0]);
+        List<List<int>> queries = new List<List<int>>();
 
-        long r = Convert.ToInt64(nr[1]);
+        for (int i = 0; i < q; i++)
+        {
+            queries.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(queriesTemp => Convert.ToInt32(queriesTemp)).ToList());
+        }
 
-        List<long> arr = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt64(arrTemp)).ToList();
+        List<int> ans = freqQuery(queries).ToList();
 
-        long ans = countTriplets(arr, r);
-
-        textWriter.WriteLine(ans);
-
-        textWriter.Flush();
-        textWriter.Close();
-    }
-
-    public static void ReadFromFile()
-    {
-        var path = Environment.GetEnvironmentVariable("OUTPUT_PATH");
-        TextWriter textWriter = new StreamWriter(path, true);
-
-        var lines = File.ReadAllLines(path.Replace("Results", "Input"));
-        string[] nr = lines[0].TrimEnd().Split(' ');
-
-        int n = Convert.ToInt32(nr[0]);
-
-        long r = Convert.ToInt64(nr[1]);
-
-        List<long> arr = lines[1].TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt64(arrTemp)).ToList();
-
-        long ans = countTriplets(arr, r);
-
-        textWriter.WriteLine(ans);
+        textWriter.WriteLine(String.Join("\n", ans));
 
         textWriter.Flush();
         textWriter.Close();

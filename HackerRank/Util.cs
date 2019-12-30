@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace HackerRank
@@ -38,6 +39,8 @@ namespace HackerRank
         public static void ReadFromFile()
         {
             var path = Environment.GetEnvironmentVariable("OUTPUT_PATH");
+            Util.Download("https://hr-testcases-us-east-1.s3.amazonaws.com/71636/input07.txt?AWSAccessKeyId=AKIAJ4WZFDFQTZRGO3QA&Expires=1577733342&Signature=T0JspNUmq%2FnBhz34lvaXKKkCJbI%3D&response-content-type=text%2Fplain", path.Replace("Results", "Input"));
+            Util.Download("https://hr-testcases-us-east-1.s3.amazonaws.com/71636/output07.txt?AWSAccessKeyId=AKIAJ4WZFDFQTZRGO3QA&Expires=1577733355&Signature=v3Uzk5BDj4dOy3x7e92mGHfx6LU%3D&response-content-type=text%2Fplain", path.Replace("Results", "Expected"));
             TextWriter textWriter = new StreamWriter(path, true);
 
             var lines = File.ReadAllLines(path.Replace("Results", "Input"));
@@ -63,6 +66,13 @@ namespace HackerRank
                 dic[key]++;
             else
                 dic[key] = 1;
+        }
+
+        public static void Download(string url, string filePath) 
+        {
+            var cl = new HttpClient();
+            var res = cl.GetStringAsync(url).Result;
+            File.WriteAllText(filePath, res);
         }
     }
 }
