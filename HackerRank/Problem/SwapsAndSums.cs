@@ -66,33 +66,5 @@ namespace HackerRank.Problem
             t1.Root = Merge(p1, Merge(q2, p3));
             t2.Root = Merge(q1, Merge(p2, q3));
         }
-
-
-        public void Main()
-        {
-            TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
-
-            string[] nq = Console.ReadLine().Split(' ');
-
-            int n = Convert.ToInt32(nq[0]);
-
-            int q = Convert.ToInt32(nq[1]);
-
-            int[] a = Array.ConvertAll(Console.ReadLine().Split(' '), aTemp => Convert.ToInt32(aTemp));
-
-            int[][] queries = new int[q][];
-
-            for (int queriesRowItr = 0; queriesRowItr < q; queriesRowItr++)
-            {
-                queries[queriesRowItr] = Array.ConvertAll(Console.ReadLine().Split(' '), queriesTemp => Convert.ToInt32(queriesTemp));
-            }
-
-            var result = Solve(a, queries).ToArray();
-
-            textWriter.WriteLine(string.Join("\n", result));
-
-            textWriter.Flush();
-            textWriter.Close();
-        }
     }
 }

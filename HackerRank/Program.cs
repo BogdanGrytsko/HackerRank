@@ -15,41 +15,71 @@ using System;
 class Solution
 {
 
-    // Complete the minimumSwaps function below.
-    static int minimumSwaps(int[] a)
+    // Complete the countTriplets function below.
+    static long countTriplets(List<long> arr, long r)
     {
-        var swaps = 0;
-        var dic = new Dictionary<int, int>();
-        for (int i = 0; i < a.Length; i++)
+        long triplets = 0;
+        var dupletDic = new Dictionary<long, long>();
+        var tripletDic = new Dictionary<long, long>();
+        foreach (var it in arr)
         {
-            dic[a[i]] = i;
+            var dupKey = it / r;
+            if (tripletDic.TryGetValue(dupKey, out var dupCnt) && it % r == 0)
+                triplets += dupCnt;
+            if (dupletDic.TryGetValue(dupKey, out var cnt) && it % r == 0)
+                AddToDic(tripletDic, it, cnt);
+            AddToDic(dupletDic, it);
         }
-        for (int i = 0; i < a.Length; i++)
-        {
-            if (a[i] - i == 1) continue;
-            var swapPos = dic[i + 1];
-            var tmp = a[swapPos];
-            a[swapPos] = a[i];
-            a[i] = tmp;
+        return triplets;
+    }
 
-            dic[a[i]] = i;
-            dic[a[swapPos]] = swapPos;
-            swaps++;
-        }
-        return swaps;
+    public static void AddToDic<TKey>(IDictionary<TKey, long> dic, TKey key, long val = 1)
+    {
+        if (dic.ContainsKey(key))
+            dic[key] += val;
+        else
+            dic[key] = val;
     }
 
     static void Main(string[] args)
     {
+        //ReadFromFile();
+        //return;
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int n = Convert.ToInt32(Console.ReadLine());
+        string[] nr = Console.ReadLine().TrimEnd().Split(' ');
 
-        int[] arr = Array.ConvertAll(Console.ReadLine().Split(' '), arrTemp => Convert.ToInt32(arrTemp))
-        ;
-        int res = minimumSwaps(arr);
+        int n = Convert.ToInt32(nr[0]);
 
-        textWriter.WriteLine(res);
+        long r = Convert.ToInt64(nr[1]);
+
+        List<long> arr = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt64(arrTemp)).ToList();
+
+        long ans = countTriplets(arr, r);
+
+        textWriter.WriteLine(ans);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+
+    public static void ReadFromFile()
+    {
+        var path = Environment.GetEnvironmentVariable("OUTPUT_PATH");
+        TextWriter textWriter = new StreamWriter(path, true);
+
+        var lines = File.ReadAllLines(path.Replace("Results", "Input"));
+        string[] nr = lines[0].TrimEnd().Split(' ');
+
+        int n = Convert.ToInt32(nr[0]);
+
+        long r = Convert.ToInt64(nr[1]);
+
+        List<long> arr = lines[1].TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt64(arrTemp)).ToList();
+
+        long ans = countTriplets(arr, r);
+
+        textWriter.WriteLine(ans);
 
         textWriter.Flush();
         textWriter.Close();
