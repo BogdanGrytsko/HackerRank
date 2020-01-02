@@ -14,45 +14,47 @@ using System;
 
 class Solution
 {
-
-    // Complete the substrCount function below.
-    static long substrCount(int n, string s)
+        public class LongestCommonSubsequence
     {
-        var cnt = 0;
-        for (int i = 0; i < s.Length; i++)
+        public int LCS(string s1, string s2)
         {
-            var startC = s[i];
-            var subCntL = SameCntLength(s, startC, i);
-            cnt += subCntL * (subCntL + 1) / 2;
-            var subCntR = SameCntLength(s, startC, i + subCntL + 1);
-            cnt += Math.Min(subCntL, subCntR);
-            i += subCntL - 1;
+            return LCS(s1, s1.Length, s2, s2.Length);
         }
-        return cnt;
+
+        private int LCS(string s1, int idx1, string s2, int idx2)
+        {
+            var table = new int[s1.Length + 1, s2.Length + 1];
+            for (int i = 0; i <= s1.Length; i++)
+            {
+                for (int j = 0; j <= s2.Length; j++)
+                {
+                    if (i == 0 || j == 0)
+                        table[i, j] = 0;
+                    else if (s1[i - 1] == s2[j - 1])
+                        table[i, j] = table[i - 1, j - 1] + 1;
+                    else
+                        table[i, j] = Math.Max(table[i - 1, j], table[i, j - 1]);
+                }
+            }
+            return table[idx1, idx2];
+        }
     }
 
-    private static int SameCntLength(string s, char startC, int start)
+    // Complete the commonChild function below.
+    static int commonChild(string s1, string s2)
     {
-        var sameCnt = 0;
-        for (int j = start; j < s.Length; j++)
-        {
-            if (s[j] == startC)
-                sameCnt++;
-            else
-                break;
-        }
-        return sameCnt;
+        return new LongestCommonSubsequence().LCS(s1, s2);
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int n = Convert.ToInt32(Console.ReadLine());
+        string s1 = Console.ReadLine();
 
-        string s = Console.ReadLine();
+        string s2 = Console.ReadLine();
 
-        long result = substrCount(n, s);
+        int result = commonChild(s1, s2);
 
         textWriter.WriteLine(result);
 
