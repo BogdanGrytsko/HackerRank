@@ -1,4 +1,4 @@
-﻿using HackerRank.DataStructure;
+﻿using HackerRank.Algorithm;
 using System.Collections.Generic;
 using Xunit;
 

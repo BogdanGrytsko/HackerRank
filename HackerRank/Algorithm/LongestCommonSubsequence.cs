@@ -1,26 +1,7 @@
-﻿using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
+﻿using System;
 
-class Solution
+namespace HackerRank.Algorithm
 {
-
-    // Complete the longestCommonSubsequence function below.
-    static int[] longestCommonSubsequence(int[] a, int[] b)
-    {
-        return new LongestCommonSubsequence().LCS(a, b);
-    }
-
     public class LongestCommonSubsequence
     {
         public int LCS(string s1, string s2)
@@ -93,28 +74,5 @@ class Solution
             }
             return lcs;
         }
-    }
-
-    static void Main(string[] args)
-    {
-        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
-
-        string[] nm = Console.ReadLine().Split(' ');
-
-        int n = Convert.ToInt32(nm[0]);
-
-        int m = Convert.ToInt32(nm[1]);
-
-        int[] a = Array.ConvertAll(Console.ReadLine().Split(' '), aTemp => Convert.ToInt32(aTemp))
-        ;
-
-        int[] b = Array.ConvertAll(Console.ReadLine().Split(' '), bTemp => Convert.ToInt32(bTemp))
-        ;
-        int[] result = longestCommonSubsequence(a, b);
-
-        textWriter.WriteLine(string.Join(" ", result));
-
-        textWriter.Flush();
-        textWriter.Close();
     }
 }

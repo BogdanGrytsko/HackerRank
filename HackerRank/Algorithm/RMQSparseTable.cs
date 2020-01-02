@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HackerRank.DataStructure
+namespace HackerRank.Algorithm
 {
     public class RMQSparseTable
     {
