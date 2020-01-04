@@ -1,27 +1,7 @@
-﻿using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
+﻿using System;
 
-class Solution
+namespace HackerRank.Algorithm
 {
-
-    // Complete the countInversions function below.
-    static long countInversions(int[] arr)
-    {
-        var res = new MergeSortInvertions().MergeAndCount(arr);
-        return res;
-    }
-
     public class MergeSortInvertions
     {
         public long MergeAndCount(int[] a)
@@ -67,26 +47,5 @@ class Solution
             Array.Copy(c, 0, a, l, r - l + 1);
             return invCount;
         }
-    }
-
-    static void Main(string[] args)
-    {
-        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
-
-        int t = Convert.ToInt32(Console.ReadLine());
-
-        for (int tItr = 0; tItr < t; tItr++)
-        {
-            int n = Convert.ToInt32(Console.ReadLine());
-
-            int[] arr = Array.ConvertAll(Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray(), arrTemp => Convert.ToInt32(arrTemp))
-            ;
-            long result = countInversions(arr);
-
-            textWriter.WriteLine(result);
-        }
-
-        textWriter.Flush();
-        textWriter.Close();
     }
 }
