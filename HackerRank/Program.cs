@@ -15,57 +15,52 @@ using System;
 class Solution
 {
 
-    // Complete the minTime function below.
-    static long minTime(long[] machines, long goal)
+    // Complete the maximumSum function below.
+    static long maximumSum(long[] a, long m)
     {
-        Array.Sort(machines);
-        return minTime(machines, goal, 0, machines[0] * goal);
+        return new MaximumSubarraySum().Solve(a, m);
     }
 
-    static long minTime(long[] machines, long goal, long l, long r)
+    public class MaximumSubarraySum
     {
-        var mid = (l + r) / 2;
-        long res = -1;
-        while (l < r)
+        public long Solve(long[] a, long m)
         {
-            mid = (l + r) / 2;
-            var g = CalcResult(machines, mid);
-            if (g < goal)
-                l = mid + 1;
-            else
+            var set = new SortedSet<long>();
+            long maxSum = 0;
+            long sum = 0;
+            for (int i = 0; i < a.Length; i++)
             {
-                res = mid;
-                r = mid;
+                sum = (sum + a[i] % m) % m;
+                var greaterItems = set.GetViewBetween(sum + 1, m + sum - maxSum);
+                if (greaterItems.Count > 0)
+                    maxSum = Math.Max(maxSum, (sum - greaterItems.Min + m) % m);
+                maxSum = Math.Max(maxSum, sum);
+                set.Add(sum);
             }
+            return maxSum;
         }
-        return res;
-    }
-
-    private static long CalcResult(long[] machines, long time)
-    {
-        long produced = 0;
-        foreach (var machine in machines)
-        {
-            produced += time / machine;
-        }
-        return produced;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] nGoal = Console.ReadLine().Split(' ');
+        int q = Convert.ToInt32(Console.ReadLine());
 
-        int n = Convert.ToInt32(nGoal[0]);
+        for (int qItr = 0; qItr < q; qItr++)
+        {
+            string[] nm = Console.ReadLine().Split(' ');
 
-        long goal = Convert.ToInt64(nGoal[1]);
+            int n = Convert.ToInt32(nm[0]);
 
-        long[] machines = Array.ConvertAll(Console.ReadLine().Split(' '), machinesTemp => Convert.ToInt64(machinesTemp))
-        ;
-        long ans = minTime(machines, goal);
+            long m = Convert.ToInt64(nm[1]);
 
-        textWriter.WriteLine(ans);
+            long[] a = Array.ConvertAll(Console.ReadLine().Split(' '), aTemp => Convert.ToInt64(aTemp))
+            ;
+            long result = maximumSum(a, m);
+
+            textWriter.WriteLine(result);
+        }
 
         textWriter.Flush();
         textWriter.Close();
