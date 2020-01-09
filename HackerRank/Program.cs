@@ -15,52 +15,70 @@ using System;
 class Solution
 {
 
-    // Complete the maximumSum function below.
-    static long maximumSum(long[] a, long m)
+    // Complete the minimumPasses function below.
+    static ulong minimumPasses(ulong m, ulong w, ulong p, ulong n)
     {
-        return new MaximumSubarraySum().Solve(a, m);
+        ulong leftovers = 0;
+        ulong iter = 0;
+        ulong iterIfJustProd = long.MaxValue;
+        while (leftovers < n)
+        {
+            iter++;
+            ulong thisDay;
+            try
+            {
+                thisDay = checked(m * w);
+                leftovers = checked(leftovers + thisDay);
+            }
+            catch (OverflowException)
+            {
+                break;
+            }
+            if (leftovers >= n)
+                break;
+            var canBuyCnt = leftovers / p;
+            if (canBuyCnt == 0)
+            {
+                var fastForwardDays = DaysToProduce(p, thisDay) - 2;
+                iter += fastForwardDays;
+                leftovers += fastForwardDays * thisDay;
+                continue;
+            }
+
+            iterIfJustProd = Math.Min(iterIfJustProd, iter + DaysToProduce(n - leftovers, thisDay));
+            leftovers -= canBuyCnt * p;
+            var total = m + w + canBuyCnt;
+            m = total / 2 + total % 2;
+            w = total / 2;
+        }
+        return Math.Min(iter, iterIfJustProd);
     }
 
-    public class MaximumSubarraySum
+    private static ulong DaysToProduce(ulong desired, ulong perDay)
     {
-        public long Solve(long[] a, long m)
-        {
-            var set = new SortedSet<long>();
-            long maxSum = 0;
-            long sum = 0;
-            for (int i = 0; i < a.Length; i++)
-            {
-                sum = (sum + a[i] % m) % m;
-                var greaterItems = set.GetViewBetween(sum + 1, m + sum - maxSum);
-                if (greaterItems.Count > 0)
-                    maxSum = Math.Max(maxSum, (sum - greaterItems.Min + m) % m);
-                maxSum = Math.Max(maxSum, sum);
-                set.Add(sum);
-            }
-            return maxSum;
-        }
+        var x = desired / perDay;
+        if (desired % perDay == 0)
+            return x;
+        return x + 1;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int q = Convert.ToInt32(Console.ReadLine());
+        string[] mwpn = Console.ReadLine().Split(' ');
 
-        for (int qItr = 0; qItr < q; qItr++)
-        {
-            string[] nm = Console.ReadLine().Split(' ');
+        var m = Convert.ToUInt64(mwpn[0]);
 
-            int n = Convert.ToInt32(nm[0]);
+        var w = Convert.ToUInt64(mwpn[1]);
 
-            long m = Convert.ToInt64(nm[1]);
+        var p = Convert.ToUInt64(mwpn[2]);
 
-            long[] a = Array.ConvertAll(Console.ReadLine().Split(' '), aTemp => Convert.ToInt64(aTemp))
-            ;
-            long result = maximumSum(a, m);
+        var n = Convert.ToUInt64(mwpn[3]);
 
-            textWriter.WriteLine(result);
-        }
+        var result = minimumPasses(m, w, p, n);
+
+        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();
