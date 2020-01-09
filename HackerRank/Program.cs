@@ -47,9 +47,38 @@ class Solution
 
             iterIfJustProd = Math.Min(iterIfJustProd, iter + DaysToProduce(n - leftovers, thisDay));
             leftovers -= canBuyCnt * p;
-            var total = m + w + canBuyCnt;
-            m = total / 2 + total % 2;
-            w = total / 2;
+            var diff = (m - w) >= 0 ? m - w : w - m;
+            if (m <= w)
+            {
+                if (canBuyCnt <= diff)
+                {
+                    m += canBuyCnt;
+                    canBuyCnt = 0;
+                }
+                else
+                {
+                    m += diff;
+                    canBuyCnt -= diff;
+                }
+            }
+            else
+            {
+                if (canBuyCnt <= diff)
+                {
+                    w += canBuyCnt;
+                    canBuyCnt = 0;
+                }
+                else
+                {
+                    w += diff;
+                    canBuyCnt -= diff;
+                }
+            }
+            if (canBuyCnt != 0)
+            {
+                m += canBuyCnt / 2 + canBuyCnt % 2;
+                w += canBuyCnt / 2;
+            }
         }
         return Math.Min(iter, iterIfJustProd);
     }
