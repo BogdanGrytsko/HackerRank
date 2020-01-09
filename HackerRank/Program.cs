@@ -36,18 +36,19 @@ class Solution
             }
             if (leftovers >= n)
                 break;
+            iterIfJustProd = Math.Min(iterIfJustProd, iter + DaysToProduce(n - leftovers, thisDay));
+
             var canBuyCnt = leftovers / p;
             if (canBuyCnt == 0)
             {
-                var fastForwardDays = DaysToProduce(p, thisDay) - 2;
+                var fastForwardDays = DaysToProduce(p - leftovers, thisDay) - 1;
                 iter += fastForwardDays;
                 leftovers += fastForwardDays * thisDay;
                 continue;
             }
 
-            iterIfJustProd = Math.Min(iterIfJustProd, iter + DaysToProduce(n - leftovers, thisDay));
             leftovers -= canBuyCnt * p;
-            var diff = (m - w) >= 0 ? m - w : w - m;
+            var diff = m > w ? m - w : w - m;
             if (m <= w)
             {
                 if (canBuyCnt <= diff)
