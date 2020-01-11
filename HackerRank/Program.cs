@@ -15,100 +15,60 @@ using System;
 class Solution
 {
 
-    // Complete the minimumPasses function below.
-    static ulong minimumPasses(ulong m, ulong w, ulong p, ulong n)
+    // Complete the reverseShuffleMerge function below.
+    static IEnumerable<int> TaleOfTwoStacks(int[][] queries)
     {
-        ulong leftovers = 0;
-        ulong iter = 0;
-        ulong iterIfJustProd = long.MaxValue;
-        while (leftovers < n)
+        var st1 = new Stack<int>();
+        var st2 = new Stack<int>();
+        foreach (var query in queries)
         {
-            iter++;
-            ulong thisDay;
-            try
+            if (query[0] == 1)
             {
-                thisDay = checked(m * w);
-                leftovers = checked(leftovers + thisDay);
+                st1.Push(query[1]);
             }
-            catch (OverflowException)
+            else if (query[0] == 2)
             {
-                break;
-            }
-            if (leftovers >= n)
-                break;
-            iterIfJustProd = Math.Min(iterIfJustProd, iter + DaysToProduce(n - leftovers, thisDay));
-
-            var canBuyCnt = leftovers / p;
-            if (canBuyCnt == 0)
-            {
-                var fastForwardDays = DaysToProduce(p - leftovers, thisDay) - 1;
-                iter += fastForwardDays;
-                leftovers += fastForwardDays * thisDay;
-                continue;
-            }
-
-            leftovers -= canBuyCnt * p;
-            var diff = m > w ? m - w : w - m;
-            if (m <= w)
-            {
-                if (canBuyCnt <= diff)
+                if (!st2.Any())
                 {
-                    m += canBuyCnt;
-                    canBuyCnt = 0;
+                    while (st1.Any())
+                    {
+                        st2.Push(st1.Pop());
+                    }
                 }
-                else
-                {
-                    m += diff;
-                    canBuyCnt -= diff;
-                }
+                st2.Pop();
             }
-            else
+            else if (query[0] == 3)
             {
-                if (canBuyCnt <= diff)
+                if (!st2.Any())
                 {
-                    w += canBuyCnt;
-                    canBuyCnt = 0;
+                    while (st1.Any())
+                    {
+                        st2.Push(st1.Pop());
+                    }
                 }
-                else
-                {
-                    w += diff;
-                    canBuyCnt -= diff;
-                }
-            }
-            if (canBuyCnt != 0)
-            {
-                m += canBuyCnt / 2 + canBuyCnt % 2;
-                w += canBuyCnt / 2;
+                yield return st2.Peek();
             }
         }
-        return Math.Min(iter, iterIfJustProd);
-    }
-
-    private static ulong DaysToProduce(ulong desired, ulong perDay)
-    {
-        var x = desired / perDay;
-        if (desired % perDay == 0)
-            return x;
-        return x + 1;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] mwpn = Console.ReadLine().Split(' ');
+        string[] nq = Console.ReadLine().Split(' ');
 
-        var m = Convert.ToUInt64(mwpn[0]);
+        int n = Convert.ToInt32(nq[0]);
 
-        var w = Convert.ToUInt64(mwpn[1]);
+        int[][] queries = new int[n][];
 
-        var p = Convert.ToUInt64(mwpn[2]);
+        for (int queriesRowItr = 0; queriesRowItr < n; queriesRowItr++)
+        {
+            queries[queriesRowItr] = Array.ConvertAll(Console.ReadLine().Split(' '), queriesTemp => Convert.ToInt32(queriesTemp));
+        }
 
-        var n = Convert.ToUInt64(mwpn[3]);
+        var result = TaleOfTwoStacks(queries).ToArray();
 
-        var result = minimumPasses(m, w, p, n);
-
-        textWriter.WriteLine(result);
+        textWriter.WriteLine(string.Join("\n", result));
 
         textWriter.Flush();
         textWriter.Close();
