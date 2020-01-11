@@ -67,5 +67,9 @@ namespace HackerRank.Algorithm
         {
             return elems[MinIdx(i, j)];
         }
+
+        public int this[int i] => elems[i];
+
+        public int Count => elems.Count;
     }
 }
