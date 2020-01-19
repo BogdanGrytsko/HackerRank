@@ -15,56 +15,41 @@ using System;
 class Solution
 {
 
-    // Complete the riddle function below.
-    static long[] MinMaxWindows(long[] arr)
+    // Complete the connectedCell function below.
+    static int connectedCell(int[][] matrix, int n, int m)
     {
-        //number -> max window size in which its minimum
-        var numDic = new Dictionary<long, int>();
-        var st = new Stack<int>();
-        for (int i = 0; i <= arr.Length; i++)
+        var traversed = new HashSet<Tuple<int, int>>();
+        var areas = new List<int>();
+        for (int i = 0; i < n; i++)
         {
-            var currH = i < arr.Length ? arr[i] : -1;
-            var lastH = st.Count > 0 ? arr[st.Peek()] : 0;
-            if (lastH < currH)
+            for (int j = 0; j < m; j++)
             {
-                st.Push(i);
-                continue;
-            }
-
-            while (st.Count > 0 && arr[st.Peek()] > currH)
-            {
-                var pop = st.Pop();
-                var longestStreak = i - pop;
-                var val = arr[pop];
-                if (!numDic.ContainsKey(val))
-                    numDic[val] = longestStreak;
-                else
-                    numDic[val] = Math.Max(numDic[val], longestStreak);
-
-                if (st.Count == 0 || arr[st.Peek()] < currH)
-                {
-                    arr[pop] = currH;
-                    st.Push(pop);
-                }
+                var area = 0;
+                BFS(matrix, i, j, traversed, n, m, ref area);
+                if (area != 0)
+                    areas.Add(area);
             }
         }
-        var invDic = new Dictionary<int, long>();
-        foreach (var pair in numDic)
+        return areas.Max();
+    }
+
+    private static void BFS(int[][] matrix, int i, int j, HashSet<Tuple<int, int>> traversed, int n, int m, ref int area)
+    {
+        var cell = Tuple.Create(i, j);
+        if (traversed.Contains(cell) || matrix[i][j] == 0)
+            return;
+        traversed.Add(cell);
+        area++;
+        for (int ii = -1; ii <= 1; ii++)
         {
-            if (invDic.ContainsKey(pair.Value))
-                invDic[pair.Value] = Math.Max(invDic[pair.Value], pair.Key);
-            else
-                invDic[pair.Value] = pair.Key;
+            for (int jj = -1; jj <= 1; jj++)
+            {
+                var x = i + ii;
+                var y = j + jj;
+                if (x >= 0 && x < n && y >= 0 && y < m)
+                    BFS(matrix, x, y, traversed, n, m, ref area);
+            }
         }
-        var res = new long[arr.Length];
-        long lastVal = 0;
-        for (int i = arr.Length ; i > 0; i--)
-        {
-            if (invDic.ContainsKey(i))
-                lastVal = Math.Max(lastVal, invDic[i]);
-            res[i - 1] = lastVal;
-        }
-        return res;
     }
 
     static void Main(string[] args)
@@ -73,11 +58,18 @@ class Solution
 
         int n = Convert.ToInt32(Console.ReadLine());
 
-        long[] arr = Array.ConvertAll(Console.ReadLine().Split(' '), arrTemp => Convert.ToInt64(arrTemp))
-        ;
-        var res = MinMaxWindows(arr);
+        int m = Convert.ToInt32(Console.ReadLine());
 
-        textWriter.WriteLine(string.Join(" ", res));
+        int[][] matrix = new int[n][];
+
+        for (int i = 0; i < n; i++)
+        {
+            matrix[i] = Array.ConvertAll(Console.ReadLine().Split(' '), matrixTemp => Convert.ToInt32(matrixTemp));
+        }
+
+        int result = connectedCell(matrix, n, m);
+
+        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();
