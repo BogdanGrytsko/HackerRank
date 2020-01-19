@@ -11,7 +11,6 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Text;
 using System;
-using HackerRank.Algorithm;
 
 class Solution
 {
@@ -21,20 +20,34 @@ class Solution
     {
         //number -> max window size in which its minimum
         var numDic = new Dictionary<long, int>();
-        var st = new Stack<long>();
-        for (int i = 0; i < arr.Length; i++)
+        var st = new Stack<int>();
+        for (int i = 0; i <= arr.Length; i++)
         {
-            var el = arr[i];
-            if (!st.Any() || st.Peek() <= el)
+            var currH = i < arr.Length ? arr[i] : -1;
+            var lastH = st.Count > 0 ? arr[st.Peek()] : 0;
+            if (lastH < currH)
             {
-                st.Push(el);
+                st.Push(i);
                 continue;
             }
 
-            UpdateCntDic(numDic, st, el);
-            st.Push(el);
+            while (st.Count > 0 && arr[st.Peek()] > currH)
+            {
+                var pop = st.Pop();
+                var longestStreak = i - pop;
+                var val = arr[pop];
+                if (!numDic.ContainsKey(val))
+                    numDic[val] = longestStreak;
+                else
+                    numDic[val] = Math.Max(numDic[val], longestStreak);
+
+                if (st.Count == 0 || arr[st.Peek()] < currH)
+                {
+                    arr[pop] = currH;
+                    st.Push(pop);
+                }
+            }
         }
-        UpdateCntDic(numDic, st, -1);
         var invDic = new Dictionary<int, long>();
         foreach (var pair in numDic)
         {
@@ -44,32 +57,14 @@ class Solution
                 invDic[pair.Value] = pair.Key;
         }
         var res = new long[arr.Length];
+        long lastVal = 0;
         for (int i = arr.Length ; i > 0; i--)
         {
             if (invDic.ContainsKey(i))
-                res[i - 1] = invDic[i];
-            else
-                res[i - 1] = res[i];
+                lastVal = Math.Max(lastVal, invDic[i]);
+            res[i - 1] = lastVal;
         }
         return res;
-    }
-
-    private static void UpdateCntDic(Dictionary<long, int> numDic, Stack<long> st, long el)
-    {
-        var cnt = 1;
-        while (st.Count > 0 && st.Peek() >= el)
-        {
-            var pop = st.Pop();
-            if (st.Count == 0)
-            {
-
-            }
-            if (!numDic.ContainsKey(pop))
-                numDic[pop] = cnt;
-            else
-                numDic[pop] = Math.Max(numDic[pop], cnt);
-            cnt++;
-        }
     }
 
     static void Main(string[] args)
