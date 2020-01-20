@@ -14,40 +14,50 @@ using System;
 
 class Solution
 {
-
-    // Complete the connectedCell function below.
-    static int connectedCell(int[][] matrix, int n, int m)
+    private static IEnumerable<char> GetTextEditor(List<Tuple<int, string>> queries)
     {
-        var traversed = new HashSet<Tuple<int, int>>();
-        var areas = new List<int>();
-        for (int i = 0; i < n; i++)
+        var st = new Stack<Tuple<int, string>>();
+        var list = new List<char>(queries.Count);
+        queries.Reverse();
+        foreach (var q in queries)
         {
-            for (int j = 0; j < m; j++)
-            {
-                var area = 0;
-                BFS(matrix, i, j, traversed, n, m, ref area);
-                if (area != 0)
-                    areas.Add(area);
-            }
+            st.Push(q);
         }
-        return areas.Max();
-    }
-
-    private static void BFS(int[][] matrix, int i, int j, HashSet<Tuple<int, int>> traversed, int n, int m, ref int area)
-    {
-        var cell = Tuple.Create(i, j);
-        if (traversed.Contains(cell) || matrix[i][j] == 0)
-            return;
-        traversed.Add(cell);
-        area++;
-        for (int ii = -1; ii <= 1; ii++)
+        var opStack = new Stack<Tuple<int, string>>();
+        while (st.Any())
         {
-            for (int jj = -1; jj <= 1; jj++)
+            var query = st.Pop();
+            if (query.Item1 == 1)
             {
-                var x = i + ii;
-                var y = j + jj;
-                if (x >= 0 && x < n && y >= 0 && y < m)
-                    BFS(matrix, x, y, traversed, n, m, ref area);
+                list.AddRange(query.Item2);
+                opStack.Push(Tuple.Create(6, query.Item2.Length.ToString()));
+            }
+            else if (query.Item1 == 2)
+            {
+                var c = int.Parse(query.Item2);
+                var removed = list.GetRange(list.Count - c, c).ToArray();
+                list.RemoveRange(list.Count - c, c);
+                var str = new string(removed);
+                opStack.Push(Tuple.Create(5, str));
+            }
+            else if (query.Item1 == 3)
+            {
+                var idx = int.Parse(query.Item2) - 1;
+                yield return list[idx];
+            }
+            else if (query.Item1 == 4)
+            {
+                var q = opStack.Pop();
+                st.Push(q);
+            }
+            else if (query.Item1 == 5)
+            {
+                list.AddRange(query.Item2);
+            }
+            else if (query.Item1 == 6)
+            {
+                var c = int.Parse(query.Item2);
+                list.RemoveRange(list.Count - c, c);
             }
         }
     }
@@ -56,20 +66,24 @@ class Solution
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int n = Convert.ToInt32(Console.ReadLine());
+        string[] nq = Console.ReadLine().Split(' ');
 
-        int m = Convert.ToInt32(Console.ReadLine());
+        int n = Convert.ToInt32(nq[0]);
 
-        int[][] matrix = new int[n][];
+        var queries = new List<Tuple<int, string>>();
 
-        for (int i = 0; i < n; i++)
+        for (int queriesRowItr = 0; queriesRowItr < n; queriesRowItr++)
         {
-            matrix[i] = Array.ConvertAll(Console.ReadLine().Split(' '), matrixTemp => Convert.ToInt32(matrixTemp));
+            var line = Console.ReadLine().Split(' ');
+            if (line.Length > 1)
+                queries.Add(Tuple.Create(int.Parse(line[0]), line[1]));
+            else
+                queries.Add(Tuple.Create(int.Parse(line[0]), string.Empty));
         }
 
-        int result = connectedCell(matrix, n, m);
+        var result = GetTextEditor(queries);
 
-        textWriter.WriteLine(result);
+        textWriter.WriteLine(string.Join("\n", result));
 
         textWriter.Flush();
         textWriter.Close();
