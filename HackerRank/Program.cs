@@ -14,76 +14,50 @@ using System;
 
 class Solution
 {
-    private static IEnumerable<char> GetTextEditor(List<Tuple<int, string>> queries)
+
+    // Complete the largestPermutation function below.
+    static int[] largestPermutation(int k, int[] arr)
     {
-        var st = new Stack<Tuple<int, string>>();
-        var list = new List<char>(queries.Count);
-        queries.Reverse();
-        foreach (var q in queries)
+        int j = 0;
+        var dic = arr.ToDictionary(el => el, el => j++);
+        var currIdx = 0;
+        for (int i = arr.Length; i > 0; i--)
         {
-            st.Push(q);
+            var idx = dic[i];
+            if (idx == currIdx) 
+            {
+                currIdx++;
+                continue;
+            }
+            //swap
+            var tmp = arr[idx];
+            arr[idx] = arr[currIdx];
+            arr[currIdx] = tmp;
+
+            dic[arr[currIdx]] = currIdx;
+            dic[arr[idx]] = idx;
+            currIdx++;
+            k--;
+            if (k == 0) break;
         }
-        var opStack = new Stack<Tuple<int, string>>();
-        while (st.Any())
-        {
-            var query = st.Pop();
-            if (query.Item1 == 1)
-            {
-                list.AddRange(query.Item2);
-                opStack.Push(Tuple.Create(6, query.Item2.Length.ToString()));
-            }
-            else if (query.Item1 == 2)
-            {
-                var c = int.Parse(query.Item2);
-                var removed = list.GetRange(list.Count - c, c).ToArray();
-                list.RemoveRange(list.Count - c, c);
-                var str = new string(removed);
-                opStack.Push(Tuple.Create(5, str));
-            }
-            else if (query.Item1 == 3)
-            {
-                var idx = int.Parse(query.Item2) - 1;
-                yield return list[idx];
-            }
-            else if (query.Item1 == 4)
-            {
-                var q = opStack.Pop();
-                st.Push(q);
-            }
-            else if (query.Item1 == 5)
-            {
-                list.AddRange(query.Item2);
-            }
-            else if (query.Item1 == 6)
-            {
-                var c = int.Parse(query.Item2);
-                list.RemoveRange(list.Count - c, c);
-            }
-        }
+        return arr;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] nq = Console.ReadLine().Split(' ');
+        string[] nk = Console.ReadLine().Split(' ');
 
-        int n = Convert.ToInt32(nq[0]);
+        int n = Convert.ToInt32(nk[0]);
 
-        var queries = new List<Tuple<int, string>>();
+        int k = Convert.ToInt32(nk[1]);
 
-        for (int queriesRowItr = 0; queriesRowItr < n; queriesRowItr++)
-        {
-            var line = Console.ReadLine().Split(' ');
-            if (line.Length > 1)
-                queries.Add(Tuple.Create(int.Parse(line[0]), line[1]));
-            else
-                queries.Add(Tuple.Create(int.Parse(line[0]), string.Empty));
-        }
+        int[] arr = Array.ConvertAll(Console.ReadLine().Split(' '), arrTemp => Convert.ToInt32(arrTemp))
+        ;
+        int[] result = largestPermutation(k, arr);
 
-        var result = GetTextEditor(queries);
-
-        textWriter.WriteLine(string.Join("\n", result));
+        textWriter.WriteLine(string.Join(" ", result));
 
         textWriter.Flush();
         textWriter.Close();
