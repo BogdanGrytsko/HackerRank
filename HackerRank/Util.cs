@@ -74,5 +74,24 @@ namespace HackerRank
             var res = cl.GetStringAsync(url).Result;
             File.WriteAllText(filePath, res);
         }
+
+        public static void WriteMatrix(int[,] matrix)
+        {
+            var path = Environment.GetEnvironmentVariable("OUTPUT_PATH");
+            var build = new StringBuilder();
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (matrix[i,j] != -1)
+                        build.Append($" {matrix[i, j].ToString("00")}");
+                    else
+                        build.Append(" XX");
+                }
+                build.AppendLine();
+            }
+            var newPath = path.Replace("Output", "Matrix");
+            File.WriteAllText(newPath, build.ToString());
+        }
     }
 }
