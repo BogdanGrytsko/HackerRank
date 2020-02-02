@@ -15,21 +15,56 @@ using System;
 class Solution
 {
 
-    // Complete the roadsAndLibraries function below.
-    static long roadsAndLibraries(int n, int c_lib, int c_road, int[][] cities)
+    // Complete the findShortest function below.
+
+    /*
+     * For the unweighted graph, <name>:
+     *
+     * 1. The number of nodes is <name>Nodes.
+     * 2. The number of edges is <name>Edges.
+     * 3. An edge exists between <name>From[i] to <name>To[i].
+     *
+     */
+    static int findShortest(int graphNodes, int[] graphFrom, int[] graphTo, long[] ids, int val)
     {
-        if (c_lib <= c_road)
-            return (long)c_lib * n;
-        long cost = 0;
-        var graph = new Tree(cities, new int[n]);
-        for (int i = 1; i < graph.Nodes.Count; i++)
+        var edges = new int[graphFrom.Length][];
+        for (int i = 0; i < graphFrom.Length; i++)
         {
-            var node = graph.Nodes[i];
-            if (node.Visited) continue;
-            var cnt = graph.DFSCount(i);
-            cost += (cnt - 1) * c_road + c_lib;
+            edges[i] = new int[2];
+            edges[i][0] = graphFrom[i];
+            edges[i][1] = graphTo[i];
         }
-        return cost;
+        var graph = new Tree(edges, ids.Select(i => (int)i).ToArray());
+        var start = new List<(int, int)>();
+        for (int i = 0; i < graph.Nodes.Count; i++)
+        {
+            if (graph.Nodes[i].Value == val)
+                start.Add((i, i));
+        }
+        return BFS(graph, new Queue<(int, int)>(start));
+    }
+
+    private static int BFS(Tree graph, Queue<(int idx, int col)> queue)
+    {
+        while (queue.Any())
+        {
+            var (idx, col) = queue.Dequeue();
+            var n = graph[idx];
+            if (n.Visited) continue;
+            n.Visited = true;
+            n.Value = col;
+            foreach (var edge in n.Edges)
+            {
+                var eNode = graph[edge];
+                if (eNode.Visited && eNode.Value != n.Value)
+                {
+                    return eNode.Depth + n.Depth;
+                }
+                eNode.Depth = n.Depth + 1;
+                queue.Enqueue((edge, col));
+            }
+        }
+        return -1;
     }
 
     public class Tree
@@ -130,31 +165,26 @@ class Solution
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int q = Convert.ToInt32(Console.ReadLine());
+        string[] graphNodesEdges = Console.ReadLine().Split(' ');
+        int graphNodes = Convert.ToInt32(graphNodesEdges[0]);
+        int graphEdges = Convert.ToInt32(graphNodesEdges[1]);
 
-        for (int qItr = 0; qItr < q; qItr++)
+        int[] graphFrom = new int[graphEdges];
+        int[] graphTo = new int[graphEdges];
+
+        for (int i = 0; i < graphEdges; i++)
         {
-            string[] nmC_libC_road = Console.ReadLine().Split(' ');
-
-            int n = Convert.ToInt32(nmC_libC_road[0]);
-
-            int m = Convert.ToInt32(nmC_libC_road[1]);
-
-            int c_lib = Convert.ToInt32(nmC_libC_road[2]);
-
-            int c_road = Convert.ToInt32(nmC_libC_road[3]);
-
-            int[][] cities = new int[m][];
-
-            for (int i = 0; i < m; i++)
-            {
-                cities[i] = Array.ConvertAll(Console.ReadLine().Split(' '), citiesTemp => Convert.ToInt32(citiesTemp));
-            }
-
-            long result = roadsAndLibraries(n, c_lib, c_road, cities);
-
-            textWriter.WriteLine(result);
+            string[] graphFromTo = Console.ReadLine().Split(' ');
+            graphFrom[i] = Convert.ToInt32(graphFromTo[0]);
+            graphTo[i] = Convert.ToInt32(graphFromTo[1]);
         }
+
+        long[] ids = Array.ConvertAll(Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray(), idsTemp => Convert.ToInt64(idsTemp));
+        int val = Convert.ToInt32(Console.ReadLine());
+
+        int ans = findShortest(graphNodes, graphFrom, graphTo, ids, val);
+
+        textWriter.WriteLine(ans);
 
         textWriter.Flush();
         textWriter.Close();
