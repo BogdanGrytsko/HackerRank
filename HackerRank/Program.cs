@@ -25,7 +25,7 @@ class Solution
      * 3. An edge exists between <name>From[i] to <name>To[i].
      *
      */
-    static int findShortest(int graphNodes, int[] graphFrom, int[] graphTo, long[] ids, int val)
+    static IEnumerable<int> RunBFS(int graphNodes, int[] graphFrom, int[] graphTo, int val)
     {
         var edges = new int[graphFrom.Length][];
         for (int i = 0; i < graphFrom.Length; i++)
@@ -34,37 +34,37 @@ class Solution
             edges[i][0] = graphFrom[i];
             edges[i][1] = graphTo[i];
         }
-        var graph = new Tree(edges, ids.Select(i => (int)i).ToArray());
-        var start = new List<(int, int)>();
-        for (int i = 0; i < graph.Nodes.Count; i++)
+        var graph = new Tree(edges, new int[graphNodes]);
+        var que = new Queue<int>();
+        que.Enqueue(val);
+        BFS(graph, que);
+        for (int i = 1; i < graph.Nodes.Count; i++)
         {
-            if (graph.Nodes[i].Value == val)
-                start.Add((i, i));
+            var n = graph.Nodes[i];
+            if (i == val) continue;
+            if (n.Depth == 0)
+                yield return -1;
+            else
+                yield return 6 * n.Depth;
         }
-        return BFS(graph, new Queue<(int, int)>(start));
     }
 
-    private static int BFS(Tree graph, Queue<(int idx, int col)> queue)
+    private static void BFS(Tree graph, Queue<int> queue)
     {
         while (queue.Any())
         {
-            var (idx, col) = queue.Dequeue();
+            var idx = queue.Dequeue();
             var n = graph[idx];
             if (n.Visited) continue;
             n.Visited = true;
-            n.Value = col;
             foreach (var edge in n.Edges)
             {
                 var eNode = graph[edge];
-                if (eNode.Visited && eNode.Value != n.Value)
-                {
-                    return eNode.Depth + n.Depth;
-                }
-                eNode.Depth = n.Depth + 1;
-                queue.Enqueue((edge, col));
+                if (eNode.Depth == 0)
+                    eNode.Depth = n.Depth + 1;
+                queue.Enqueue(edge);
             }
         }
-        return -1;
     }
 
     public class Tree
@@ -165,28 +165,34 @@ class Solution
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] graphNodesEdges = Console.ReadLine().Split(' ');
-        int graphNodes = Convert.ToInt32(graphNodesEdges[0]);
-        int graphEdges = Convert.ToInt32(graphNodesEdges[1]);
-
-        int[] graphFrom = new int[graphEdges];
-        int[] graphTo = new int[graphEdges];
-
-        for (int i = 0; i < graphEdges; i++)
+        var q = Convert.ToInt32(Console.ReadLine());
+        for (int i = 0; i < q; i++)
         {
-            string[] graphFromTo = Console.ReadLine().Split(' ');
-            graphFrom[i] = Convert.ToInt32(graphFromTo[0]);
-            graphTo[i] = Convert.ToInt32(graphFromTo[1]);
+            string[] graphNodesEdges = Console.ReadLine().Split(' ');
+            int graphNodes = Convert.ToInt32(graphNodesEdges[0]);
+            int graphEdges = Convert.ToInt32(graphNodesEdges[1]);
+
+            int[] graphFrom = new int[graphEdges];
+            int[] graphTo = new int[graphEdges];
+
+            for (int j = 0; j < graphEdges; j++)
+            {
+                var ln = Console.ReadLine();
+                string[] graphFromTo = ln.Split(' ');
+                graphFrom[j] = Convert.ToInt32(graphFromTo[0]);
+                graphTo[j] = Convert.ToInt32(graphFromTo[1]);
+            }
+
+            //long[] ids = Array.ConvertAll(Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray(), idsTemp => Convert.ToInt64(idsTemp));
+            int val = Convert.ToInt32(Console.ReadLine());
+
+            var ans = RunBFS(graphNodes, graphFrom, graphTo, val);
+
+            textWriter.WriteLine(string.Join(" ", ans));
+
+            textWriter.Flush();
         }
 
-        long[] ids = Array.ConvertAll(Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray(), idsTemp => Convert.ToInt64(idsTemp));
-        int val = Convert.ToInt32(Console.ReadLine());
-
-        int ans = findShortest(graphNodes, graphFrom, graphTo, ids, val);
-
-        textWriter.WriteLine(ans);
-
-        textWriter.Flush();
         textWriter.Close();
     }
 }
