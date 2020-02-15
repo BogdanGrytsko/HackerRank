@@ -15,62 +15,32 @@ using System;
 class Solution
 {
 
-    // Complete the maxRegion function below.
-    static int maxRegion(int[][] grid, int n, int m)
+    // Complete the dayOfProgrammer function below.
+    static string dayOfProgrammer(int year)
     {
-        var set = new HashSet<(int, int)>();
-        var max = int.MinValue;
-        for (int i = 0; i < n; i++)
+        if (year < 1918)
         {
-            for (int j = 0; j < m; j++)
-            {
-                var que = new Queue<(int, int)>();
-                que.Enqueue((i, j));
-                var reg = BFS(grid, n, m, set, que);
-                max = Math.Max(max, reg);
-            }
+            if (year % 4 == 0)
+                return $"12.09.{year}";
+            return $"13.09.{year}";
         }
-        return max;
-    }
+        if (year == 1918)
+            return "26.09.1918";
 
-    private static int BFS(int[][] grid, int n, int m, HashSet<(int, int)> set, Queue<(int i, int j)> queue)
-    {
-        int c = 0;
-        while (queue.Any())
-        {
-            var x = queue.Dequeue();
-            if (set.Contains(x) || x.i < 0 || x.i >= n || x.j < 0 || x.j >= m || grid[x.i][x.j] == 0) continue;
-            c++;
-            set.Add(x);
-            for (int i = -1; i <= 1; i++)
-            {
-                for (int j = -1; j <= 1; j++)
-                {
-                    queue.Enqueue((x.i + i, x.j + j));
-                }
-            }
-        }
-        return c;
+        if (year % 400 == 0 || (year % 4 == 0 && year%100 != 0))
+            return $"12.09.{year}";
+        return $"13.09.{year}";
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        int n = Convert.ToInt32(Console.ReadLine());
+        int year = Convert.ToInt32(Console.ReadLine().Trim());
 
-        int m = Convert.ToInt32(Console.ReadLine());
+        string result = dayOfProgrammer(year);
 
-        int[][] grid = new int[n][];
-
-        for (int i = 0; i < n; i++)
-        {
-            grid[i] = Array.ConvertAll(Console.ReadLine().Split(' '), gridTemp => Convert.ToInt32(gridTemp));
-        }
-
-        int res = maxRegion(grid, n, m);
-
-        textWriter.WriteLine(res);
+        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();
