@@ -15,176 +15,91 @@ using System;
 class Solution
 {
 
-    // Complete the findShortest function below.
-
-    /*
-     * For the unweighted graph, <name>:
-     *
-     * 1. The number of nodes is <name>Nodes.
-     * 2. The number of edges is <name>Edges.
-     * 3. An edge exists between <name>From[i] to <name>To[i].
-     *
-     */
-    static int findShortest(int graphNodes, int[] graphFrom, int[] graphTo, long[] ids, int val)
+    // Complete the formingMagicSquare function below.
+    static int formingMagicSquare(int[][] s)
     {
-        var edges = new int[graphFrom.Length][];
-        for (int i = 0; i < graphFrom.Length; i++)
-        {
-            edges[i] = new int[2];
-            edges[i][0] = graphFrom[i];
-            edges[i][1] = graphTo[i];
-        }
-        var graph = new Tree(edges, ids.Select(i => (int)i).ToArray());
-        var start = new List<(int, int)>();
-        for (int i = 0; i < graph.Nodes.Count; i++)
-        {
-            if (graph.Nodes[i].Value == val)
-                start.Add((i, i));
-        }
-        return BFS(graph, new Queue<(int, int)>(start));
-    }
-
-    private static int BFS(Tree graph, Queue<(int idx, int col)> queue)
-    {
-        while (queue.Any())
-        {
-            var (idx, col) = queue.Dequeue();
-            var n = graph[idx];
-            if (n.Visited) continue;
-            n.Visited = true;
-            n.Value = col;
-            foreach (var edge in n.Edges)
+        var list = new List<List<List<int>>> {
+            new List<List<int>>
             {
-                var eNode = graph[edge];
-                if (eNode.Visited && eNode.Value != n.Value)
+                new List<int> { 8, 1 ,6 },
+                new List<int> { 3, 5 ,7 },
+                new List<int> { 4, 9 ,2 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 6, 1 ,8 },
+                new List<int> { 7, 5 ,3 },
+                new List<int> { 2, 9 ,4 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 4, 9 ,2 },
+                new List<int> { 3, 5 ,7 },
+                new List<int> { 8, 1 ,6 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 2, 9 ,4 },
+                new List<int> { 7, 5 ,3 },
+                new List<int> { 6, 1 ,8 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 8, 3 ,4 },
+                new List<int> { 1, 5 ,9 },
+                new List<int> { 6, 7 ,2 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 4, 3 ,8 },
+                new List<int> { 9, 5 ,1 },
+                new List<int> { 2, 7 ,6 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 6, 7 ,2 },
+                new List<int> { 1, 5 ,9 },
+                new List<int> { 8, 3 ,4 },
+            },
+            new List<List<int>>
+            {
+                new List<int> { 2, 7 ,6 },
+                new List<int> { 9, 5 ,1 },
+                new List<int> { 4, 3 ,8 },
+            },
+        };
+
+        var minDist = int.MaxValue;
+        var dist = 0;
+        foreach (var item in list)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
                 {
-                    return eNode.Depth + n.Depth;
+                    dist += Math.Abs(item[i][j] - s[i][j]);
                 }
-                eNode.Depth = n.Depth + 1;
-                queue.Enqueue((edge, col));
             }
+            minDist = Math.Min(minDist, dist);
+            dist = 0;
         }
-        return -1;
-    }
-
-    public class Tree
-    {
-        public class Node
-        {
-            public int ParentIdx { get; set; }
-            public long Sum { get; set; }
-            public int Value { get; set; }
-            public bool Visited { get; set; }
-            public int Depth { get; set; }
-            public int HeavyIdx { get; set; }
-            public int HeadIdx { get; set; }
-            public int PosIdx { get; set; }
-            public List<int> Edges { get; set; }
-
-            public int Count { get; set; }
-
-            public Node(int val)
-            {
-                Value = val;
-                Sum = val;
-                Edges = new List<int>();
-                HeavyIdx = -1;
-                Count = 1;
-            }
-
-            public override string ToString()
-            {
-                return $"V: {Value}, S: {Sum}, C: {Count}, E: {Edges.Count}";
-            }
-        }
-
-        public Tree(int[][] edges, int[] c)
-        {
-            //to start numeration from 1
-            Nodes.Add(new Node(-1));
-            for (int i = 0; i < c.Length; i++)
-                Nodes.Add(new Node(c[i]));
-            foreach (var edge in edges)
-            {
-                Nodes[edge[0]].Edges.Add(edge[1]);
-                Nodes[edge[1]].Edges.Add(edge[0]);
-            }
-            RootIdx = 1;
-        }
-
-        public Tree(IEnumerable<Node> nodes, int rootIdx)
-        {
-            RootIdx = rootIdx;
-            Nodes = nodes.ToList();
-        }
-
-        public int RootIdx { get; private set; }
-
-        public void ResetVisited()
-        {
-            foreach (var node in Nodes)
-            {
-                node.Visited = false;
-            }
-        }
-
-        public List<Node> Nodes { get; } = new List<Node>();
-
-        public Node this[int nodeIdx]
-        {
-            get
-            {
-                return Nodes[nodeIdx];
-            }
-        }
-
-        public long DFSSum(int nodeIdx)
-        {
-            var node = Nodes[nodeIdx];
-            if (node.Visited)
-                return 0;
-            node.Visited = true;
-            foreach (var edge in node.Edges)
-                node.Sum += DFSSum(edge);
-            return node.Sum;
-        }
-
-        public int DFSCount(int nodeIdx)
-        {
-            var node = Nodes[nodeIdx];
-            if (node.Visited)
-                return 0;
-            node.Visited = true;
-            foreach (var edge in node.Edges)
-                node.Count += DFSCount(edge);
-            return node.Count;
-        }
+        return minDist;
     }
 
     static void Main(string[] args)
     {
         TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
 
-        string[] graphNodesEdges = Console.ReadLine().Split(' ');
-        int graphNodes = Convert.ToInt32(graphNodesEdges[0]);
-        int graphEdges = Convert.ToInt32(graphNodesEdges[1]);
+        int[][] s = new int[3][];
 
-        int[] graphFrom = new int[graphEdges];
-        int[] graphTo = new int[graphEdges];
-
-        for (int i = 0; i < graphEdges; i++)
+        for (int i = 0; i < 3; i++)
         {
-            string[] graphFromTo = Console.ReadLine().Split(' ');
-            graphFrom[i] = Convert.ToInt32(graphFromTo[0]);
-            graphTo[i] = Convert.ToInt32(graphFromTo[1]);
+            s[i] = Array.ConvertAll(Console.ReadLine().Split(' '), sTemp => Convert.ToInt32(sTemp));
         }
 
-        long[] ids = Array.ConvertAll(Console.ReadLine().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray(), idsTemp => Convert.ToInt64(idsTemp));
-        int val = Convert.ToInt32(Console.ReadLine());
+        int result = formingMagicSquare(s);
 
-        int ans = findShortest(graphNodes, graphFrom, graphTo, ids, val);
-
-        textWriter.WriteLine(ans);
+        textWriter.WriteLine(result);
 
         textWriter.Flush();
         textWriter.Close();
