@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Xunit;
-// ReSharper disable InconsistentNaming
 
 namespace XTest.Codility
 {
@@ -10,20 +9,20 @@ namespace XTest.Codility
         [Fact]
         public void Test()
         {
-            Assert.Equal(1, solution(new[] {3, 1, 2, 4, 3}));
+            Assert.Equal(1, Solution(new[] {3, 1, 2, 4, 3}));
         }
 
-        public int solution(int[] A)
+        public int Solution(int[] a)
         {
             var globalMin = int.MaxValue;
-            int left = A[0];
-            int right = A.Skip(1).Sum();
+            int left = a[0];
+            int right = a.Skip(1).Sum();
             int dif = Math.Abs(left - right);
             globalMin = Math.Min(globalMin, dif);
-            for (int i = 1; i < A.Length - 1; i++)
+            for (int i = 1; i < a.Length - 1; i++)
             {
-                left += A[i];
-                right -= A[i];
+                left += a[i];
+                right -= a[i];
                 dif = Math.Abs(left - right);
                 globalMin = Math.Min(globalMin, dif);
             }

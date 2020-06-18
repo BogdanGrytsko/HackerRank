@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Xunit;
-// ReSharper disable InconsistentNaming
 
 namespace XTest.Codility
 {
@@ -9,25 +8,25 @@ namespace XTest.Codility
         [Fact]
         public void Test()
         {
-            Assert.Equal(4, solution(new []{ 2, 3, 1, 5}));
+            Assert.Equal(4, Solution(new []{ 2, 3, 1, 5}));
         }
 
         [Fact]
         public void Test_Last()
         {
-            Assert.Equal(5, solution(new[] { 2, 3, 1, 4 }));
+            Assert.Equal(5, Solution(new[] { 2, 3, 1, 4 }));
         }
 
         [Fact]
         public void Empty_Array()
         {
-            Assert.Equal(1, solution(new int[0]));
+            Assert.Equal(1, Solution(new int[0]));
         }
 
-        public int solution(int[] A)
+        public int Solution(int[] a)
         {
-            var arr = Enumerable.Range(1, A.Length + 1);
-            return arr.Except(A).Single();
+            var arr = Enumerable.Range(1, a.Length + 1);
+            return arr.Except(a).Single();
         }
     }
 }

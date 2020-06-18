@@ -4,7 +4,7 @@ using Xunit;
 
 namespace XTest
 {
-    public class AVLTreeTest
+    public class AvlTreeTest
     {
         [Fact]
         public void AVLTree_Add_Remove()

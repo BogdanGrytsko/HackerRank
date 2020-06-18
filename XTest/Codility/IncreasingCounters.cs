@@ -1,6 +1,5 @@
 ﻿using System;
 using Xunit;
-// ReSharper disable InconsistentNaming
 
 namespace XTest.Codility
 {
@@ -9,18 +8,18 @@ namespace XTest.Codility
         [Fact]
         public void Test()
         {
-            Assert.Equal(new[] {3, 2, 2, 4, 2}, solution(5, new[] {3, 4, 4, 6, 1, 4, 4}));
+            Assert.Equal(new[] {3, 2, 2, 4, 2}, Solution(5, new[] {3, 4, 4, 6, 1, 4, 4}));
         }
 
-        public int[] solution(int N, int[] A)
+        public int[] Solution(int n, int[] a)
         {
-            var x = new int[N];
+            var x = new int[n];
             int max = 0, min = -1;
-            for (int i = 0; i < A.Length; i++)
+            for (int i = 0; i < a.Length; i++)
             {
-                if (A[i] <= N)
+                if (a[i] <= n)
                 {
-                    var idx = A[i] - 1;
+                    var idx = a[i] - 1;
                     if (x[idx] < min)
                         x[idx] = min + 1;
                     else

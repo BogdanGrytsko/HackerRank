@@ -4,7 +4,7 @@ using Xunit;
 
 namespace XTest
 {
-    public class RMQTest
+    public class RmqTest
     {
         [Fact]
         public void RMQ_SparseTable()

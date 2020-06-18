@@ -1,7 +1,5 @@
 ﻿using Xunit;
 
-// ReSharper disable InconsistentNaming
-
 namespace XTest.Codility
 {
     public class FrogJump
@@ -9,32 +7,32 @@ namespace XTest.Codility
         [Fact]
         public void Test1()
         {
-            Assert.Equal(3, solution(10, 85, 30));
+            Assert.Equal(3, Solution(10, 85, 30));
         }
 
         [Fact]
         public void Same_Position()
         {
-            Assert.Equal(0, solution(10, 10, 30));
+            Assert.Equal(0, Solution(10, 10, 30));
         }
 
         [Fact]
         public void Exact_Jump()
         {
-            Assert.Equal(2, solution(10, 80, 35));
+            Assert.Equal(2, Solution(10, 80, 35));
         }
 
         [Fact]
         public void BIG_D()
         {
-            Assert.Equal(1, solution(10, 80, 1000000000));
+            Assert.Equal(1, Solution(10, 80, 1000000000));
         }
 
-        private static int solution(int X, int Y, int D)
+        private static int Solution(int x, int y, int d)
         {
-            var dist = Y - X;
-            var steps = dist / D;
-            if (dist % D != 0)
+            var dist = y - x;
+            var steps = dist / d;
+            if (dist % d != 0)
                 steps++;
             return steps;
         }
