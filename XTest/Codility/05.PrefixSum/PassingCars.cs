@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace XTest.Codility
+namespace XTest.Codility._05.PrefixSum
 {
     public class PassingCars
     {

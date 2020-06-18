@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace XTest.Codility
+namespace XTest.Codility._04.CountingElements
 {
     public class IncreasingCounters
     {

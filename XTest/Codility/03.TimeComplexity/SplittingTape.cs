@@ -2,7 +2,7 @@
 using System.Linq;
 using Xunit;
 
-namespace XTest.Codility
+namespace XTest.Codility._03.TimeComplexity
 {
     public class SplittingTape
     {
