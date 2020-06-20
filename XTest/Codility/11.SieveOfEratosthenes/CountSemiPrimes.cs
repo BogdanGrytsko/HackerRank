@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace XTest.Codility._11.SieveOfEratosthenes
@@ -40,6 +41,7 @@ namespace XTest.Codility._11.SieveOfEratosthenes
                             semiPrimeFound = true;
                         break;
                     }
+                    if (prime > Math.Sqrt(i)) break;
                 }
                 if (primeFound)
                     primes.Add(i);
