@@ -25,42 +25,29 @@ namespace XTest.Codility._11.SieveOfEratosthenes
 
         public int[] Solution(int N, int[] P, int[] Q)
         {
+            var semiPrimesCnt = new int[N + 1];
             var primes = new HashSet<int>();
-            primes.Add(2);
-            for (int i = 3; i <= N; i += 2)
+            for (int i = 2; i <= N; i++)
             {
                 var primeFound = true;
-                foreach (var prime in primes)
-                {
-                    if (i % prime == 0)
-                    {
-                        primeFound = false;
-                        break;
-                    }
-                }
-                if (primeFound)
-                    primes.Add(i);
-            }
-
-            var semiPrimesCnt = new int[N + 1];
-            for (int i = 1; i <= N; i++)
-            {
                 var semiPrimeFound = false;
                 foreach (var prime in primes)
                 {
                     if (i % prime == 0)
                     {
+                        primeFound = false;
                         if (primes.Contains(i / prime))
-                        {
                             semiPrimeFound = true;
-                        }
                         break;
                     }
                 }
+                if (primeFound)
+                    primes.Add(i);
                 semiPrimesCnt[i] = semiPrimesCnt[i - 1];
                 if (semiPrimeFound)
                     semiPrimesCnt[i]++;
             }
+
             var res = new int[P.Length];
             for (int i = 0; i < P.Length; i++)
             {
