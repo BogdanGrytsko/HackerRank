@@ -17,6 +17,12 @@ namespace XTest.Codility._11.SieveOfEratosthenes
             Assert.Equal(new[] { 10, 4, 0 }, Solution(50000, new[] { 1, 4, 16 }, new[] { 26, 10, 20 }));
         }
 
+        [Fact]
+        public void Four_Test()
+        {
+            Assert.Equal(new[] { 1 }, Solution(10, new[] { 4 }, new[] { 4 }));
+        }
+
         public int[] Solution(int N, int[] P, int[] Q)
         {
             var primes = new HashSet<int>();
@@ -36,23 +42,29 @@ namespace XTest.Codility._11.SieveOfEratosthenes
                     primes.Add(i);
             }
 
-            var semiPrimes = new SortedSet<int>();
-            for (int i = 4; i <= N; i++)
+            var semiPrimesCnt = new int[N + 1];
+            for (int i = 1; i <= N; i++)
             {
+                var semiPrimeFound = false;
                 foreach (var prime in primes)
                 {
-                    if (i % prime == 0 && (primes.Contains(i / prime)))
+                    if (i % prime == 0)
                     {
-                        semiPrimes.Add(i);
+                        if (primes.Contains(i / prime))
+                        {
+                            semiPrimeFound = true;
+                        }
                         break;
                     }
                 }
+                semiPrimesCnt[i] = semiPrimesCnt[i - 1];
+                if (semiPrimeFound)
+                    semiPrimesCnt[i]++;
             }
             var res = new int[P.Length];
             for (int i = 0; i < P.Length; i++)
             {
-                var cnt = semiPrimes.GetViewBetween(P[i], Q[i]).Count;
-                res[i] = cnt;
+                res[i] = semiPrimesCnt[Q[i]] - semiPrimesCnt[P[i] - 1];
             }
 
             return res;
