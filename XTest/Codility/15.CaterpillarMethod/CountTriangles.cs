@@ -22,7 +22,7 @@ namespace XTest.Codility._15.CaterpillarMethod
             if (A.Length < 3)
                 return 0;
             Array.Sort(A);
-            int j = 1, k = 2, cnt = 0;
+            int j, k, cnt = 0;
             for (int i = 0; i < A.Length - 2; i++)
             {
                 j = i + 1;
