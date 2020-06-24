@@ -8,6 +8,7 @@ using Xunit;
 namespace XTest.Training
 {
     //72/93
+    //didn't handle int.MinValue
     public class Task1
     {
         [Fact]
@@ -34,6 +35,16 @@ namespace XTest.Training
             Assert.Equal(4, Solution("ABCD", new[] {0, -1, 1, 2}, new[] {0, -1, 1, 2}));
         }
 
+        [Fact]
+        public void Max_Test()
+        {
+            var x = int.MinValue * (long) int.MinValue;
+            Assert.True(x > 0);
+            var y = x * 2;
+            Assert.False(y > 0);
+            Assert.Equal(3, Solution("ABC", new[] { 0, int.MinValue, int.MaxValue }, new[] { 0, int.MinValue, int.MaxValue }));
+        }
+
         public int Solution(string S, int[] X, int[] Y)
         {
             int cnt = 0;
@@ -43,8 +54,10 @@ namespace XTest.Training
             {
                 points.Add(Tuple.Create(X[i], Y[i], X[i] * (long) X[i] + Y[i] * (long) Y[i], S[i]));
             }
-            //todo : handle large X,Y (10^9)
-            points = points.OrderBy(p => p.Item3).ToList();
+
+            var overFlow = points.Where(p => p.Item3 < 0);
+            points = points.Where(p => p.Item3 >= 0).OrderBy(p => p.Item3).ToList();
+            points.AddRange(overFlow);
             for (int i = 0; i < points.Count; i++)
             {
                 var point = points[i];

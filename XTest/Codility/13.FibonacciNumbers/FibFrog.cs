@@ -16,6 +16,7 @@ namespace XTest.Codility._13.FibonacciNumbers
         [Fact]
         public void Perf_Test_All_Set()
         {
+            Assert.False(true);
             var arr = new int[100000];
             for (int i = 0; i < arr.Length; i++)
             {
