@@ -26,6 +26,13 @@ namespace XTest.Training
         }
 
         [Fact]
+        public void Perf_Test()
+        {
+            Assert.True(false);
+            Assert.Equal(6, Solution(new string('A', 100000), 50000));
+        }
+
+        [Fact]
         public void TestLn()
         {
             Assert.Equal(9, EncodedLn("ABBBCCDDCCC"));
@@ -34,7 +41,7 @@ namespace XTest.Training
         [Fact]
         public void TestLn2()
         {
-            Assert.Equal(3, EncodedLn("AAAAAAAAAAA"));
+            Assert.Equal(3, EncodedLn(new string('A', 10)));
         }
 
         [Fact]
