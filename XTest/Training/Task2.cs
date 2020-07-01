@@ -4,6 +4,7 @@ using Xunit;
 namespace XTest.Training
 {
     //22/0
+    //wrong EncodedLn func - 10A had length of 2, but should had 3
     public class Task2
     {
         [Fact]
@@ -27,7 +28,25 @@ namespace XTest.Training
         [Fact]
         public void TestLn()
         {
-            Assert.Equal(9, EncodedLn("ABBBCCDDCCC", 0, 11));
+            Assert.Equal(9, EncodedLn("ABBBCCDDCCC"));
+        }
+
+        [Fact]
+        public void TestLn2()
+        {
+            Assert.Equal(3, EncodedLn("AAAAAAAAAAA"));
+        }
+
+        [Fact]
+        public void TestLn3()
+        {
+            Assert.Equal(1, EncodedLn("A"));
+        }
+
+        [Fact]
+        public void TestLn4()
+        {
+            Assert.Equal(5, EncodedLn("ABBBCCCC"));
         }
 
         public int Solution(string S, int K)
@@ -38,32 +57,43 @@ namespace XTest.Training
             for (int i = 0; i < S.Length - K; i++)
             {
                 var s = S.Remove(i, K);
-                var enc = EncodedLn(s, 0, s.Length);
+                var enc = EncodedLn(s);
                 min = Math.Min(min, enc);
             }
             return min;
         }
 
-        private static int EncodedLn(string s, int start, int len)
+        private static int EncodedLn(string s)
         {
             char sC = 'c';
-            int enc = 0, grp = 0;
-            for (int i = start; i < len; i++)
+            int enc = 0, grp = 1;
+            for (int i = 0; i < s.Length; i++)
             {
-                if (s[i] == sC && grp == 1)
+                if (s[i] == sC)
                 {
-                    grp = 2;
-                    enc++;
+                    grp++;
                 }
                 else if (s[i] != sC)
                 {
                     sC = s[i];
+                    if (i != 0)
+                    {
+                        enc += GetEncCnt(grp);
+                    }
                     grp = 1;
-                    enc++;
                 }
             }
 
+            enc += GetEncCnt(grp);
+
             return enc;
+        }
+
+        private static int GetEncCnt(int grp)
+        {
+            if (grp == 1)
+                return 1;
+            return grp.ToString().Length + 1;
         }
     }
 }
