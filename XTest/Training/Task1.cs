@@ -49,15 +49,13 @@ namespace XTest.Training
         {
             int cnt = 0;
             var encountered = new HashSet<char>();
-            var points = new List<Tuple<int, int, long, char>>();
+            var points = new List<Tuple<int, int, ulong, char>>();
             for (int i = 0; i < X.Length; i++)
             {
-                points.Add(Tuple.Create(X[i], Y[i], X[i] * (long) X[i] + Y[i] * (long) Y[i], S[i]));
+                points.Add(Tuple.Create(X[i], Y[i], (ulong)X[i] * (ulong) X[i] + (ulong)Y[i] * (ulong) Y[i], S[i]));
             }
 
-            var overFlow = points.Where(p => p.Item3 < 0);
-            points = points.Where(p => p.Item3 >= 0).OrderBy(p => p.Item3).ToList();
-            points.AddRange(overFlow);
+            points = points.OrderBy(p => p.Item3).ToList();
             for (int i = 0; i < points.Count; i++)
             {
                 var point = points[i];
