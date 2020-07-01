@@ -4,6 +4,7 @@ using Xunit;
 namespace XTest.Training
 {
     //57/14
+    //had addition instead of multiplication
     public class Task3
     {
         [Fact]
@@ -54,6 +55,12 @@ namespace XTest.Training
             Assert.Equal(2, Solution("aaaabaa"));
         }
 
+        [Fact]
+        public void Multiply_Test()
+        {
+            Assert.Equal(16, Solution("abbbabbba"));
+        }
+
         public int Solution(string S)
         {
             var acnt = S.Count(c => c == 'a');
@@ -88,9 +95,7 @@ namespace XTest.Training
                 }
             }
 
-            if (b1Cnt == 0 && b2Cnt == 0)
-                return 1;
-            return (b1Cnt == 0 ? 0 : b1Cnt + 1) + (b2Cnt == 0 ? b2Cnt : b2Cnt + 1);
+            return (++b1Cnt) * (++b2Cnt);
         }
     }
 }
