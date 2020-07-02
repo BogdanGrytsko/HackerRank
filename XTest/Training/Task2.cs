@@ -70,18 +70,24 @@ namespace XTest.Training
             int min = int.MaxValue;
             int startLen = 0, endLen = 0;
             var sb = new StringBuilder();
-            string startStr = "", endStr = "" + S[K];
+            sb.Append(S[K]);
+            string startStr = "", endStr = "";
             for (int i = K + 1; i < S.Length; i++)
             {
                 if (S[i] == S[K])
-                    endStr += S[i];
+                    sb.Append(S[K]);
                 else
                 {
                     endLen = EncodedLn(S.Substring(i, S.Length - i));
+                    endStr = sb.ToString();
                     min = endLen + GetEncCnt(endStr.Length);
                     break;
                 }
             }
+
+            if (endStr == "")
+                endStr = sb.ToString();
+            sb.Clear();
 
             for (int i = 0; i < S.Length - K; i++)
             {
@@ -89,6 +95,7 @@ namespace XTest.Training
                 var ec = S[i + K];
                 if (startStr.EndsWith(sc))
                 {
+                    //todo : this can be improved further
                     startStr += sc;
                 }
                 else
