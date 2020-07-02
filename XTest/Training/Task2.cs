@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Xunit;
 
 namespace XTest.Training
@@ -28,7 +29,7 @@ namespace XTest.Training
         [Fact]
         public void Perf_Test()
         {
-            Assert.True(false);
+            //Assert.True(false);
             Assert.Equal(6, Solution(new string('A', 100000), 50000));
         }
 
@@ -56,15 +57,99 @@ namespace XTest.Training
             Assert.Equal(5, EncodedLn("ABBBCCCC"));
         }
 
+        [Fact]
+        public void Test4()
+        {
+            Assert.Equal(2, Solution("AABBAA", 2));
+        }
+
         public int Solution(string S, int K)
         {
             if (K >= S.Length - 2)
                 return S.Length - K;
             int min = int.MaxValue;
+            int startLen = 0, endLen = 0;
+            var sb = new StringBuilder();
+            string startStr = "", endStr = "" + S[K];
+            for (int i = K + 1; i < S.Length; i++)
+            {
+                if (S[i] == S[K])
+                    endStr += S[i];
+                else
+                {
+                    endLen = EncodedLn(S.Substring(i, S.Length - i));
+                    min = endLen + GetEncCnt(endStr.Length);
+                    break;
+                }
+            }
+
             for (int i = 0; i < S.Length - K; i++)
             {
-                var s = S.Remove(i, K);
-                var enc = EncodedLn(s);
+                var sc = S[i];
+                var ec = S[i + K];
+                if (startStr.EndsWith(sc))
+                {
+                    startStr += sc;
+                }
+                else
+                {
+                    startLen += GetEncCnt(startStr.Length);
+                    startStr = "" + sc;
+                }
+
+                if (endStr.StartsWith(ec))
+                {
+                    endStr = endStr.Substring(1, endStr.Length - 1);
+                }
+
+                var enc = startLen;
+                if (endStr.Length == 0)
+                {
+                    var newEnd = "";
+                    if (i + K + 1 < S.Length)
+                    {
+                        newEnd += S[i + K + 1];
+                    }
+                    for (int j = i + K + 2; j < S.Length; j++)
+                    {
+                        if (S[j] == newEnd[0])
+                            newEnd += S[j];
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    var newEndLen = GetEncCnt(newEnd.Length);
+                    if (newEndLen != endLen)
+                    {
+                        enc += endLen;
+                        if (newEnd.Length > 0 && startStr[0] == newEnd[0])
+                            enc += GetEncCnt(startStr.Length + endStr.Length);
+                        else
+                            enc += GetEncCnt(startStr.Length) + GetEncCnt(endStr.Length);
+                    }
+                        
+                    else
+                    {
+                        if (newEnd.Length > 0 && startStr[0] == newEnd[0])
+                            enc += GetEncCnt(startStr.Length + newEnd.Length);
+                        else
+                            enc += GetEncCnt(startStr.Length) + GetEncCnt(newEnd.Length);
+                    }
+
+                    endStr = newEnd;
+                    endLen -= newEndLen;
+                }
+                else
+                {
+                    enc += endLen;
+                    if (startStr[0] == endStr[0])
+                        enc += GetEncCnt(startStr.Length + endStr.Length);
+                    else
+                        enc += GetEncCnt(startStr.Length) + GetEncCnt(endStr.Length);
+                }
+
                 min = Math.Min(min, enc);
             }
             return min;
@@ -72,6 +157,8 @@ namespace XTest.Training
 
         private static int EncodedLn(string s)
         {
+            if (s == "")
+                return 0;
             char sC = 'c';
             int enc = 0, grp = 1;
             for (int i = 0; i < s.Length; i++)
@@ -98,9 +185,15 @@ namespace XTest.Training
 
         private static int GetEncCnt(int grp)
         {
-            if (grp == 1)
-                return 1;
-            return grp.ToString().Length + 1;
+            switch (grp)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    return 1;
+                default:
+                    return grp.ToString().Length + 1;
+            }
         }
     }
 }

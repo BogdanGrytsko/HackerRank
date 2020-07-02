@@ -52,7 +52,7 @@ namespace XTest.Training
             var points = new List<Tuple<int, int, ulong, char>>();
             for (int i = 0; i < X.Length; i++)
             {
-                points.Add(Tuple.Create(X[i], Y[i], (ulong)X[i] * (ulong) X[i] + (ulong)Y[i] * (ulong) Y[i], S[i]));
+                points.Add(Tuple.Create(X[i], Y[i], (ulong) ((long) X[i] * X[i]) + (ulong) (Y[i] * (long) Y[i]), S[i]));
             }
 
             points = points.OrderBy(p => p.Item3).ToList();
