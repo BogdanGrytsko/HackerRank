@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Xunit;
 
 namespace XTest.Training
@@ -63,100 +62,101 @@ namespace XTest.Training
             Assert.Equal(2, Solution("AABBAA", 2));
         }
 
+        private class Str
+        {
+            public char Char { get; set; }
+            public int Cnt { get; set; }
+
+            public Str()
+            {
+                Char = '0';
+                Cnt = 0;
+            }
+
+            public Str(char c)
+            {
+                Char = c;
+                Cnt = 1;
+            }
+        }
+
         public int Solution(string S, int K)
         {
             if (K >= S.Length - 2)
                 return S.Length - K;
             int min = int.MaxValue;
+            Str start = new Str(), end = new Str(S[K]);
             int startLen = 0, endLen = 0;
-            var sb = new StringBuilder();
-            sb.Append(S[K]);
-            char startStrC = '0';
-            int startStrCnt = 0;
-            string endStr = "";
             for (int i = K + 1; i < S.Length; i++)
             {
-                if (S[i] == S[K])
-                    sb.Append(S[K]);
+                if (S[i] == end.Char)
+                    end.Cnt++;
                 else
                 {
                     endLen = EncodedLn(S.Substring(i, S.Length - i));
-                    endStr = sb.ToString();
-                    min = endLen + GetEncCnt(endStr.Length);
+                    min = endLen + GetEncCnt(end.Cnt);
                     break;
                 }
             }
-
-            if (endStr == "")
-                endStr = sb.ToString();
-            sb.Clear();
 
             for (int i = 0; i < S.Length - K; i++)
             {
                 var sc = S[i];
                 var ec = S[i + K];
-                if (startStrC == sc)
-                {
-                    startStrCnt++;
-                }
+                if (start.Char == sc)
+                    start.Cnt++;
                 else
                 {
-                    startLen += GetEncCnt(startStrCnt);
-                    startStrCnt = 1;
-                    startStrC = sc;
+                    startLen += GetEncCnt(start.Cnt);
+                    start = new Str(sc);
                 }
 
-                if (endStr.StartsWith(ec))
-                {
-                    endStr = endStr.Substring(1, endStr.Length - 1);
-                }
+                if (end.Char == ec)
+                    end.Cnt--;
 
                 var enc = startLen;
-                if (endStr.Length == 0)
+                if (end.Cnt == 0)
                 {
-                    var newEnd = "";
+                    Str newEnd = new Str();
                     if (i + K + 1 < S.Length)
                     {
-                        newEnd += S[i + K + 1];
+                        newEnd = new Str(S[i + K + 1]);
                     }
                     for (int j = i + K + 2; j < S.Length; j++)
                     {
-                        if (S[j] == newEnd[0])
-                            newEnd += S[j];
+                        if (S[j] == newEnd.Char)
+                            newEnd.Cnt++;
                         else
-                        {
                             break;
-                        }
                     }
 
-                    var newEndLen = GetEncCnt(newEnd.Length);
+                    var newEndLen = GetEncCnt(newEnd.Cnt);
                     if (newEndLen != endLen)
                     {
                         enc += endLen;
-                        if (newEnd.Length > 0 && startStrC == newEnd[0])
-                            enc += GetEncCnt(startStrCnt + endStr.Length);
+                        if (newEnd.Cnt > 0 && start.Char == newEnd.Char)
+                            enc += GetEncCnt(start.Cnt + end.Cnt);
                         else
-                            enc += GetEncCnt(startStrCnt) + GetEncCnt(endStr.Length);
+                            enc += GetEncCnt(start.Cnt) + GetEncCnt(end.Cnt);
                     }
-                        
                     else
                     {
-                        if (newEnd.Length > 0 && startStrC == newEnd[0])
-                            enc += GetEncCnt(startStrCnt + newEnd.Length);
+                        if (newEnd.Cnt > 0 && start.Char == newEnd.Char)
+                            enc += GetEncCnt(start.Cnt + newEnd.Cnt);
                         else
-                            enc += GetEncCnt(startStrCnt) + GetEncCnt(newEnd.Length);
+                            enc += GetEncCnt(start.Cnt) + GetEncCnt(newEnd.Cnt);
                     }
 
-                    endStr = newEnd;
+                    end = newEnd;
                     endLen -= newEndLen;
                 }
                 else
                 {
                     enc += endLen;
-                    if (startStrC == endStr[0])
-                        enc += GetEncCnt(startStrCnt + endStr.Length);
+                    if (start.Char == end.Char)
+                        enc += GetEncCnt(start.Cnt + end.Cnt);
                     else
-                        enc += GetEncCnt(startStrCnt) + GetEncCnt(endStr.Length);
+                        enc += GetEncCnt(start.Cnt) + GetEncCnt(end.Cnt);
                 }
 
                 min = Math.Min(min, enc);
