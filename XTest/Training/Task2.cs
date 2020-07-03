@@ -71,7 +71,9 @@ namespace XTest.Training
             int startLen = 0, endLen = 0;
             var sb = new StringBuilder();
             sb.Append(S[K]);
-            string startStr = "", endStr = "";
+            char startStrC = '0';
+            int startStrCnt = 0;
+            string endStr = "";
             for (int i = K + 1; i < S.Length; i++)
             {
                 if (S[i] == S[K])
@@ -93,15 +95,15 @@ namespace XTest.Training
             {
                 var sc = S[i];
                 var ec = S[i + K];
-                if (startStr.EndsWith(sc))
+                if (startStrC == sc)
                 {
-                    //todo : this can be improved further
-                    startStr += sc;
+                    startStrCnt++;
                 }
                 else
                 {
-                    startLen += GetEncCnt(startStr.Length);
-                    startStr = "" + sc;
+                    startLen += GetEncCnt(startStrCnt);
+                    startStrCnt = 1;
+                    startStrC = sc;
                 }
 
                 if (endStr.StartsWith(ec))
@@ -131,18 +133,18 @@ namespace XTest.Training
                     if (newEndLen != endLen)
                     {
                         enc += endLen;
-                        if (newEnd.Length > 0 && startStr[0] == newEnd[0])
-                            enc += GetEncCnt(startStr.Length + endStr.Length);
+                        if (newEnd.Length > 0 && startStrC == newEnd[0])
+                            enc += GetEncCnt(startStrCnt + endStr.Length);
                         else
-                            enc += GetEncCnt(startStr.Length) + GetEncCnt(endStr.Length);
+                            enc += GetEncCnt(startStrCnt) + GetEncCnt(endStr.Length);
                     }
                         
                     else
                     {
-                        if (newEnd.Length > 0 && startStr[0] == newEnd[0])
-                            enc += GetEncCnt(startStr.Length + newEnd.Length);
+                        if (newEnd.Length > 0 && startStrC == newEnd[0])
+                            enc += GetEncCnt(startStrCnt + newEnd.Length);
                         else
-                            enc += GetEncCnt(startStr.Length) + GetEncCnt(newEnd.Length);
+                            enc += GetEncCnt(startStrCnt) + GetEncCnt(newEnd.Length);
                     }
 
                     endStr = newEnd;
@@ -151,10 +153,10 @@ namespace XTest.Training
                 else
                 {
                     enc += endLen;
-                    if (startStr[0] == endStr[0])
-                        enc += GetEncCnt(startStr.Length + endStr.Length);
+                    if (startStrC == endStr[0])
+                        enc += GetEncCnt(startStrCnt + endStr.Length);
                     else
-                        enc += GetEncCnt(startStr.Length) + GetEncCnt(endStr.Length);
+                        enc += GetEncCnt(startStrCnt) + GetEncCnt(endStr.Length);
                 }
 
                 min = Math.Min(min, enc);
